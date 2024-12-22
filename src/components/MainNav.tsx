@@ -4,7 +4,8 @@ import {
   Users, 
   Building2, 
   UserCircle,
-  FileText
+  FileText,
+  User
 } from "lucide-react";
 import { 
   SidebarMenu, 
@@ -58,6 +59,13 @@ export const MainNav = () => {
         path: "/forms",
         label: "Forms",
         icon: FileText,
+        visible: true,
+      },
+      // Profile is available to all roles
+      {
+        path: "/profile",
+        label: "Profile",
+        icon: User,
         visible: true,
       }
     ];
