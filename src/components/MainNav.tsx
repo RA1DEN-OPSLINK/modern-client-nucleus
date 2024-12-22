@@ -33,7 +33,7 @@ export const MainNav = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("*, organizations(*)")
         .eq("id", user.id)
         .single();
 
@@ -67,38 +67,29 @@ export const MainNav = () => {
         label: "Profile",
         icon: User,
         visible: true,
-      }
-    ];
-
-    // Organization management for tenant only
-    if (profile?.role === "tenant") {
-      items.push({
-        path: "/tenant",
-        label: "Organization",
-        icon: Building2,
-        visible: true,
-      });
-    }
-
-    // Teams management for tenant and manager
-    if (profile?.role === "tenant" || profile?.role === "manager") {
-      items.push({
+      },
+      // Teams management for tenant and manager
+      {
         path: "/teams",
         label: "Teams",
         icon: UserCircle,
-        visible: true,
-      });
-    }
-
-    // Clients management for tenant and manager
-    if (profile?.role === "tenant" || profile?.role === "manager") {
-      items.push({
+        visible: profile?.role === "tenant" || profile?.role === "manager",
+      },
+      // Clients management for tenant and manager
+      {
         path: "/clients",
         label: "Clients",
         icon: Users,
-        visible: true,
-      });
-    }
+        visible: profile?.role === "tenant" || profile?.role === "manager",
+      },
+      // Organization management for tenant only
+      {
+        path: "/tenant",
+        label: "Organization",
+        icon: Building2,
+        visible: profile?.role === "tenant",
+      }
+    ];
 
     return items;
   };
