@@ -35,14 +35,39 @@ const SessionHandler = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check initial session
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session check error:", error);
+          navigate('/auth');
+          return;
+        }
+        
+        if (!session) {
+          navigate('/auth');
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+        navigate('/auth');
+      }
+    };
+
+    checkSession();
+
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         // Clear query cache on sign out
         queryClient.clear();
         navigate('/auth');
-      } else if (event === 'SIGNED_IN') {
+      } else if (event === 'SIGNED_IN' && session) {
         navigate('/');
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Session token refreshed');
       }
     });
 

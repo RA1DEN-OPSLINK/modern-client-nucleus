@@ -12,14 +12,24 @@ export const Header = () => {
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
       navigate("/auth");
-    } catch (error) {
+    } catch (error: any) {
+      // If we get a 403 user_not_found error, the session is already invalid
+      // so we should clear it locally and redirect to auth
+      if (error.status === 403 && error.message.includes('user_not_found')) {
+        console.log('User session invalid, redirecting to auth');
+        navigate("/auth");
+        return;
+      }
+
       toast({
         variant: "destructive",
         title: "Error signing out",
         description: "Please try again later",
       });
+      console.error("Sign out error:", error);
     }
   };
 
