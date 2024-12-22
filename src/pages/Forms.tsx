@@ -4,15 +4,26 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useSessionContext } from "@supabase/auth-helpers-react";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Forms() {
   const { toast } = useToast();
+  const { session, isLoading: isSessionLoading } = useSessionContext();
+  const navigate = useNavigate();
 
-  const { data: forms, isLoading } = useQuery({
+  // Check authentication
+  useEffect(() => {
+    if (!isSessionLoading && !session) {
+      navigate('/auth');
+    }
+  }, [session, isSessionLoading, navigate]);
+
+  const { data: forms, isLoading: isFormsLoading } = useQuery({
     queryKey: ["forms"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!session?.user) return [];
 
       const { data, error } = await supabase
         .from("forms")
@@ -30,9 +41,20 @@ export default function Forms() {
 
       return data;
     },
+    enabled: !!session?.user, // Only run query if user is authenticated
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isSessionLoading || isFormsLoading) {
+    return (
+      <div className="flex h-[200px] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null; // Will redirect in useEffect
+  }
 
   return (
     <div className="space-y-4">
