@@ -1,3 +1,13 @@
+import type {
+  ClientsTable,
+  OrganizationsTable,
+  PermissionsTable,
+  ProfilesTable,
+  RolePermissionsTable,
+  TeamMembersTable,
+  TeamsTable
+} from './tables';
+
 export type Json =
   | string
   | number
