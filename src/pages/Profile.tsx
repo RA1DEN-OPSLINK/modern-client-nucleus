@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileForm } from "@/components/ProfileForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProfilesTable } from "@/integrations/supabase/types/tables";
 
 const Profile = () => {
   const { session } = useSessionContext();
@@ -18,10 +19,21 @@ const Profile = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      
+      // Ensure the role is of the correct type
+      if (!isValidRole(data.role)) {
+        throw new Error("Invalid role type received from database");
+      }
+      
+      return data as ProfilesTable["Row"];
     },
     enabled: !!session?.user.id,
   });
+
+  // Type guard to ensure role is valid
+  const isValidRole = (role: string): role is ProfilesTable["Row"]["role"] => {
+    return ["tenant", "manager", "team", "client"].includes(role);
+  };
 
   if (isLoading) {
     return (
@@ -45,7 +57,7 @@ const Profile = () => {
           <CardTitle>My Profile</CardTitle>
         </CardHeader>
         <CardContent>
-          <ProfileForm profile={profile} />
+          {profile && <ProfileForm profile={profile} />}
         </CardContent>
       </Card>
     </div>
