@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Teams from "./pages/Teams";
 import Clients from "./pages/Clients";
 import Tenant from "./pages/Tenant";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 const supabase = createClient(
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/teams" element={<AppLayout><Teams /></AppLayout>} />
               <Route path="/clients" element={<AppLayout><Clients /></AppLayout>} />
               <Route path="/tenant" element={<AppLayout><Tenant /></AppLayout>} />
+              <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
