@@ -53,6 +53,60 @@ export type Database = {
           },
         ]
       }
+      forms: {
+        Row: {
+          created_at: string
+          data: Json
+          description: string | null
+          form_type: string
+          id: string
+          organization_id: string
+          profile_id: string
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          description?: string | null
+          form_type: string
+          id?: string
+          organization_id: string
+          profile_id: string
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          description?: string | null
+          form_type?: string
+          id?: string
+          organization_id?: string
+          profile_id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forms_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forms_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string

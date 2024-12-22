@@ -4,6 +4,7 @@ import {
   Users, 
   Building2, 
   UserCircle,
+  FileText
 } from "lucide-react";
 import { 
   SidebarMenu, 
@@ -52,6 +53,13 @@ export const MainNav = () => {
         icon: BarChart3,
         visible: true,
       },
+      // Forms are available to all roles
+      {
+        path: "/forms",
+        label: "Forms",
+        icon: FileText,
+        visible: true,
+      }
     ];
 
     // Organization management for tenant only

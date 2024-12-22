@@ -13,6 +13,7 @@ import Teams from "./pages/Teams";
 import Clients from "./pages/Clients";
 import Tenant from "./pages/Tenant";
 import Profile from "./pages/Profile";
+import Forms from "./pages/Forms";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="/clients" element={<AppLayout><Clients /></AppLayout>} />
               <Route path="/tenant" element={<AppLayout><Tenant /></AppLayout>} />
               <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
+              <Route path="/forms" element={<AppLayout><Forms /></AppLayout>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
