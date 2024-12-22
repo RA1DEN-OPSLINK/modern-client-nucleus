@@ -4,7 +4,6 @@ import {
   Users, 
   Building2, 
   UserCircle,
-  ChevronRight 
 } from "lucide-react";
 import { 
   SidebarMenu, 
@@ -18,7 +17,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfilesTable } from "@/integrations/supabase/types/tables";
-import { cn } from "@/lib/utils";
 
 export const MainNav = () => {
   const location = useLocation();
@@ -44,9 +42,52 @@ export const MainNav = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const isTenant = profile?.role === "tenant";
-  const canManageTeams = profile?.role === "tenant" || profile?.role === "manager";
-  const canManageClients = profile?.role === "tenant" || profile?.role === "manager";
+  // Define navigation items based on roles
+  const getNavigationItems = () => {
+    const items = [
+      // Dashboard is available to all roles
+      {
+        path: "/",
+        label: "Dashboard",
+        icon: BarChart3,
+        visible: true,
+      },
+    ];
+
+    // Organization management for tenant only
+    if (profile?.role === "tenant") {
+      items.push({
+        path: "/tenant",
+        label: "Organization",
+        icon: Building2,
+        visible: true,
+      });
+    }
+
+    // Teams management for tenant and manager
+    if (profile?.role === "tenant" || profile?.role === "manager") {
+      items.push({
+        path: "/teams",
+        label: "Teams",
+        icon: UserCircle,
+        visible: true,
+      });
+    }
+
+    // Clients management for tenant and manager
+    if (profile?.role === "tenant" || profile?.role === "manager") {
+      items.push({
+        path: "/clients",
+        label: "Clients",
+        icon: Users,
+        visible: true,
+      });
+    }
+
+    return items;
+  };
+
+  const navigationItems = getNavigationItems();
 
   return (
     <>
@@ -54,66 +95,21 @@ export const MainNav = () => {
         <SidebarGroupLabel>Overview</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <Link to="/">
-                <SidebarMenuButton 
-                  isActive={isActive("/")} 
-                  tooltip={isCollapsed ? "Dashboard" : undefined}
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  <span>Dashboard</span>
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-
-            {isTenant && (
-              <SidebarMenuItem>
-                <Link to="/tenant">
-                  <SidebarMenuButton 
-                    isActive={isActive("/tenant")} 
-                    tooltip={isCollapsed ? "Organization" : undefined}
-                  >
-                    <Building2 className="h-4 w-4" />
-                    <span>Organization</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            )}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-
-      <SidebarGroup>
-        <SidebarGroupLabel>Management</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {canManageClients && (
-              <SidebarMenuItem>
-                <Link to="/clients">
-                  <SidebarMenuButton 
-                    isActive={isActive("/clients")} 
-                    tooltip={isCollapsed ? "Clients" : undefined}
-                  >
-                    <Users className="h-4 w-4" />
-                    <span>Clients</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            )}
-
-            {canManageTeams && (
-              <SidebarMenuItem>
-                <Link to="/teams">
-                  <SidebarMenuButton 
-                    isActive={isActive("/teams")} 
-                    tooltip={isCollapsed ? "Teams" : undefined}
-                  >
-                    <UserCircle className="h-4 w-4" />
-                    <span>Teams</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            )}
+            {navigationItems.map((item) => (
+              item.visible && (
+                <SidebarMenuItem key={item.path}>
+                  <Link to={item.path}>
+                    <SidebarMenuButton 
+                      isActive={isActive(item.path)} 
+                      tooltip={isCollapsed ? item.label : undefined}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
+              )
+            ))}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
