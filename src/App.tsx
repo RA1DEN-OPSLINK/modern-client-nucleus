@@ -9,6 +9,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AppLayout } from "./layouts/AppLayout";
 import Auth from "./pages/Auth";
 import Index from "./pages/Index";
+import Teams from "./pages/Teams";
+import Clients from "./pages/Clients";
 
 const queryClient = new QueryClient();
 const supabase = createClient(
@@ -26,14 +28,9 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
-              <Route
-                path="/"
-                element={
-                  <AppLayout>
-                    <Index />
-                  </AppLayout>
-                }
-              />
+              <Route path="/" element={<AppLayout><Index /></AppLayout>} />
+              <Route path="/teams" element={<AppLayout><Teams /></AppLayout>} />
+              <Route path="/clients" element={<AppLayout><Clients /></AppLayout>} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
