@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Users, Building2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { TeamsTable } from "./TeamsTable";
-import { ClientsTable } from "./ClientsTable";
-import { CreateTeamDialog } from "./CreateTeamDialog";
-import { CreateClientDialog } from "./CreateClientDialog";
+import { TeamsTable } from "@/components/TeamsTable";
+import { ClientsTable } from "@/components/ClientsTable";
+import { CreateTeamDialog } from "@/components/CreateTeamDialog";
+import { CreateClientDialog } from "@/components/CreateClientDialog";
 import { useState } from "react";
 
 export default function Tenant() {
