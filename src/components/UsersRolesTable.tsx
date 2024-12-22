@@ -8,9 +8,17 @@ export function UsersRolesTable() {
   const { data: users, isLoading: usersLoading } = useQuery({
     queryKey: ["profiles"],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select(`
+          *,
+          auth_user:id (
+            email
+          )
+        `)
         .order("created_at", { ascending: false });
       
       if (error) throw error;
@@ -45,7 +53,6 @@ export function UsersRolesTable() {
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Role Description</TableHead>
           <TableHead>Joined</TableHead>
@@ -62,7 +69,6 @@ export function UsersRolesTable() {
               <TableCell>
                 {user.first_name} {user.last_name}
               </TableCell>
-              <TableCell>{user.email}</TableCell>
               <TableCell>
                 <Badge variant="outline" className="capitalize">
                   {user.role}
