@@ -1,9 +1,32 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSessionContext } from "@supabase/auth-helpers-react";
-import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { ChevronRight } from "lucide-react";
+import { 
+  Sidebar, 
+  SidebarContent, 
+  SidebarHeader, 
+  SidebarProvider, 
+  SidebarTrigger,
+  useSidebar 
+} from "@/components/ui/sidebar";
 import { Header } from "@/components/Header";
 import { MainNav } from "@/components/MainNav";
+import { cn } from "@/lib/utils";
+
+const SidebarToggle = () => {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
+  return (
+    <SidebarTrigger className="ml-auto">
+      <ChevronRight className={cn(
+        "h-4 w-4 transition-transform",
+        isCollapsed ? "rotate-0" : "rotate-180"
+      )} />
+    </SidebarTrigger>
+  );
+};
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { session, isLoading } = useSessionContext();
@@ -29,7 +52,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <Sidebar>
           <SidebarHeader className="flex h-[60px] items-center border-b px-6">
             <span className="text-lg font-semibold">CRM</span>
-            <SidebarTrigger className="ml-auto" />
+            <SidebarToggle />
           </SidebarHeader>
           <SidebarContent>
             <MainNav />

@@ -1,12 +1,19 @@
 import { Link, useLocation } from "react-router-dom";
-import { BarChart3, Users, Building2, UserCircle } from "lucide-react";
-import { SidebarMenu, SidebarMenuButton } from "@/components/ui/sidebar";
+import { BarChart3, Users, Building2, UserCircle, ChevronRight } from "lucide-react";
+import { 
+  SidebarMenu, 
+  SidebarMenuButton,
+  SidebarTrigger,
+  useSidebar
+} from "@/components/ui/sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfilesTable } from "@/integrations/supabase/types/tables";
 
 export const MainNav = () => {
   const location = useLocation();
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -34,7 +41,10 @@ export const MainNav = () => {
   return (
     <SidebarMenu>
       <Link to="/">
-        <SidebarMenuButton isActive={isActive("/")} tooltip="Dashboard">
+        <SidebarMenuButton 
+          isActive={isActive("/")} 
+          tooltip={isCollapsed ? "Dashboard" : undefined}
+        >
           <BarChart3 className="h-4 w-4" />
           <span>Dashboard</span>
         </SidebarMenuButton>
@@ -42,7 +52,10 @@ export const MainNav = () => {
 
       {isTenant && (
         <Link to="/tenant">
-          <SidebarMenuButton isActive={isActive("/tenant")} tooltip="Organization">
+          <SidebarMenuButton 
+            isActive={isActive("/tenant")} 
+            tooltip={isCollapsed ? "Organization" : undefined}
+          >
             <Building2 className="h-4 w-4" />
             <span>Organization</span>
           </SidebarMenuButton>
@@ -51,7 +64,10 @@ export const MainNav = () => {
 
       {canManageClients && (
         <Link to="/clients">
-          <SidebarMenuButton isActive={isActive("/clients")} tooltip="Clients">
+          <SidebarMenuButton 
+            isActive={isActive("/clients")} 
+            tooltip={isCollapsed ? "Clients" : undefined}
+          >
             <Users className="h-4 w-4" />
             <span>Clients</span>
           </SidebarMenuButton>
@@ -60,7 +76,10 @@ export const MainNav = () => {
 
       {canManageTeams && (
         <Link to="/teams">
-          <SidebarMenuButton isActive={isActive("/teams")} tooltip="Teams">
+          <SidebarMenuButton 
+            isActive={isActive("/teams")} 
+            tooltip={isCollapsed ? "Teams" : undefined}
+          >
             <UserCircle className="h-4 w-4" />
             <span>Teams</span>
           </SidebarMenuButton>
