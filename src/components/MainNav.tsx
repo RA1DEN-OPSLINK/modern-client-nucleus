@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { BarChart3, Users, MapPin, FileText, UserCircle } from "lucide-react";
+import { BarChart3, Users, MapPin, FileText, UserCircle, Building } from "lucide-react";
 import { SidebarMenu, SidebarMenuButton } from "@/components/ui/sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +27,7 @@ export const MainNav = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const isTenant = profile?.role === "tenant";
   const canManageTeams = profile?.role === "tenant" || profile?.role === "manager";
   const canManageClients = profile?.role === "tenant" || profile?.role === "manager";
 
@@ -38,6 +39,14 @@ export const MainNav = () => {
           <span>Dashboard</span>
         </SidebarMenuButton>
       </Link>
+      {isTenant && (
+        <Link to="/tenant">
+          <SidebarMenuButton isActive={isActive("/tenant")} tooltip="Tenant">
+            <Building />
+            <span>Organization</span>
+          </SidebarMenuButton>
+        </Link>
+      )}
       {canManageClients && (
         <Link to="/clients">
           <SidebarMenuButton isActive={isActive("/clients")} tooltip="Clients">
