@@ -136,6 +136,24 @@ export type Database = {
           },
         ]
       }
+      role_definitions: {
+        Row: {
+          created_at: string
+          description: string
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           created_at: string
@@ -241,7 +259,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "tenant" | "manager" | "team" | "client"
     }
     CompositeTypes: {
       [_ in never]: never

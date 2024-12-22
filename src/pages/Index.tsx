@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { Users, UserCheck, UserCircle, UserPlus } from "lucide-react";
+import { UsersRolesTable } from "@/components/UsersRolesTable";
 
 const Index = () => {
   const { session } = useSessionContext();
@@ -52,6 +53,15 @@ const Index = () => {
           </Card>
         ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Users & Roles</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <UsersRolesTable />
+        </CardContent>
+      </Card>
     </div>
   );
 };
