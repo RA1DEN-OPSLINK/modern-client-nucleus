@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { BarChart3, Users, MapPin, FileText, UserCircle, Building } from "lucide-react";
+import { BarChart3, Users, Building2, UserCircle } from "lucide-react";
 import { SidebarMenu, SidebarMenuButton } from "@/components/ui/sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,46 +35,37 @@ export const MainNav = () => {
     <SidebarMenu>
       <Link to="/">
         <SidebarMenuButton isActive={isActive("/")} tooltip="Dashboard">
-          <BarChart3 />
+          <BarChart3 className="h-4 w-4" />
           <span>Dashboard</span>
         </SidebarMenuButton>
       </Link>
+
       {isTenant && (
         <Link to="/tenant">
-          <SidebarMenuButton isActive={isActive("/tenant")} tooltip="Tenant">
-            <Building />
+          <SidebarMenuButton isActive={isActive("/tenant")} tooltip="Organization">
+            <Building2 className="h-4 w-4" />
             <span>Organization</span>
           </SidebarMenuButton>
         </Link>
       )}
+
       {canManageClients && (
         <Link to="/clients">
           <SidebarMenuButton isActive={isActive("/clients")} tooltip="Clients">
-            <Users />
+            <Users className="h-4 w-4" />
             <span>Clients</span>
           </SidebarMenuButton>
         </Link>
       )}
+
       {canManageTeams && (
         <Link to="/teams">
           <SidebarMenuButton isActive={isActive("/teams")} tooltip="Teams">
-            <UserCircle />
+            <UserCircle className="h-4 w-4" />
             <span>Teams</span>
           </SidebarMenuButton>
         </Link>
       )}
-      <Link to="/maps">
-        <SidebarMenuButton isActive={isActive("/maps")} tooltip="Maps">
-          <MapPin />
-          <span>Maps</span>
-        </SidebarMenuButton>
-      </Link>
-      <Link to="/reports">
-        <SidebarMenuButton isActive={isActive("/reports")} tooltip="Reports">
-          <FileText />
-          <span>Reports</span>
-        </SidebarMenuButton>
-      </Link>
     </SidebarMenu>
   );
 };

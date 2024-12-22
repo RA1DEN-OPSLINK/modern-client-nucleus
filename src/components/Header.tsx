@@ -1,12 +1,25 @@
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 export const Header = () => {
   const { session } = useSessionContext();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+      navigate("/auth");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: "Please try again later",
+      });
+    }
   };
 
   return (
