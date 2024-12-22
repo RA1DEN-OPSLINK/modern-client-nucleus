@@ -39,7 +39,11 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   }, [session, isLoading, navigate]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   if (!session) {
@@ -48,10 +52,10 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <SidebarProvider defaultOpen>
-      <div className="relative flex min-h-screen">
+      <div className="relative flex min-h-screen w-full">
         <Sidebar>
-          <SidebarHeader className="flex h-[60px] items-center border-b px-6">
-            <span className="text-lg font-semibold">CRM</span>
+          <SidebarHeader className="flex h-16 items-center border-b px-6">
+            <span className="text-lg font-semibold">Navigation</span>
             <SidebarToggle />
           </SidebarHeader>
           <SidebarContent>
@@ -60,7 +64,9 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
         </Sidebar>
         <div className="flex w-full flex-col">
           <Header />
-          <main className="flex-1 space-y-4 p-4 md:p-8 pt-2">{children}</main>
+          <main className="flex-1 space-y-4 p-4 md:p-8 pt-2">
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>
