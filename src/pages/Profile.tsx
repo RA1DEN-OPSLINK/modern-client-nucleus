@@ -37,21 +37,11 @@ const Profile = () => {
         throw new Error("Profile not found");
       }
       
-      // Ensure the role is of the correct type
-      if (!isValidRole(data.role)) {
-        throw new Error("Invalid role type received from database");
-      }
-      
       return data as ProfilesTable["Row"];
     },
     enabled: !!session?.user?.id,
     retry: 1
   });
-
-  // Type guard to ensure role is valid
-  const isValidRole = (role: string): role is ProfilesTable["Row"]["role"] => {
-    return ["tenant", "manager", "team", "client"].includes(role);
-  };
 
   if (error) {
     return (
@@ -82,7 +72,6 @@ const Profile = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <Skeleton className="h-20 w-20 rounded-full" />
-            <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
           </CardContent>
