@@ -5,11 +5,13 @@ import { ProfileForm } from "@/components/ProfileForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProfilesTable } from "@/integrations/supabase/types/tables";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const Profile = () => {
   const { session } = useSessionContext();
   
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, error } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -35,6 +37,17 @@ const Profile = () => {
     return ["tenant", "manager", "team", "client"].includes(role);
   };
 
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Failed to load profile. Please try refreshing the page.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   if (isLoading) {
     return (
       <Card>
@@ -42,6 +55,7 @@ const Profile = () => {
           <CardTitle>My Profile</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <Skeleton className="h-20 w-20 rounded-full" />
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
