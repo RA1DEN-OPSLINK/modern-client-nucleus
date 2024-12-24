@@ -1,6 +1,3 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSessionContext } from "@supabase/auth-helpers-react";
 import { ChevronRight } from "lucide-react";
 import { 
   Sidebar, 
@@ -29,27 +26,6 @@ const SidebarToggle = () => {
 };
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
-  const { session, isLoading } = useSessionContext();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isLoading && !session) {
-      navigate("/auth");
-    }
-  }, [session, isLoading, navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return null;
-  }
-
   return (
     <SidebarProvider defaultOpen>
       <div className="relative flex min-h-screen w-full">
