@@ -7,6 +7,8 @@ import { menuItems } from './menu-items';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
+type Role = 'tenant' | 'manager' | 'team';
+
 export const SidebarMenu = () => {
   const location = useLocation();
   const { session } = useSessionContext();
@@ -33,7 +35,7 @@ export const SidebarMenu = () => {
   return (
     <nav className="mt-4">
       {menuItems
-        .filter(item => item.roles.includes(userRole))
+        .filter(item => item.roles.includes(userRole as Role))
         .map(item => {
           const Icon = Icons[item.icon];
           return (
