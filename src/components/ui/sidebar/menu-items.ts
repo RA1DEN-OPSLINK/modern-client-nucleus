@@ -1,8 +1,6 @@
-import { Icons } from './icons';
-
 export type MenuItem = {
   title: string;
-  icon: JSX.Element;
+  icon: keyof typeof import('./icons').Icons;  // Changed to use icon name string
   path: string;
   roles: Array<'tenant' | 'manager' | 'team'>;
 };
@@ -10,37 +8,37 @@ export type MenuItem = {
 export const menuItems: MenuItem[] = [
   {
     title: 'Dashboard',
-    icon: <Icons.Dashboard />,
+    icon: 'Dashboard',
     path: '/',
     roles: ['tenant', 'manager', 'team'],
   },
   {
     title: 'Clients',
-    icon: <Icons.Users />,
+    icon: 'Users',
     path: '/clients',
     roles: ['tenant', 'manager', 'team'],
   },
   {
     title: 'Teams',
-    icon: <Icons.Users />,
+    icon: 'Users',
     path: '/teams',
     roles: ['tenant', 'manager'],
   },
   {
     title: 'Forms',
-    icon: <Icons.Calendar />,
+    icon: 'Calendar',
     path: '/forms',
     roles: ['tenant', 'manager', 'team'],
   },
   {
     title: 'Profile',
-    icon: <Icons.Settings />,
+    icon: 'Settings',
     path: '/profile',
     roles: ['tenant', 'manager', 'team'],
   },
   {
     title: 'Tenant',
-    icon: <Icons.Settings />,
+    icon: 'Settings',
     path: '/tenant',
     roles: ['tenant'],
   },

@@ -34,21 +34,24 @@ export const SidebarMenu = () => {
     <nav className="mt-4">
       {menuItems
         .filter(item => item.roles.includes(userRole))
-        .map(item => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex items-center px-4 py-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors",
-              location.pathname === item.path && "bg-sidebar-accent text-sidebar-accent-foreground"
-            )}
-          >
-            <span className="inline-flex items-center justify-center">
-              {item.icon}
-            </span>
-            <span className="ml-3 text-sm font-medium">{item.title}</span>
-          </Link>
-        ))}
+        .map(item => {
+          const Icon = Icons[item.icon];
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "flex items-center px-4 py-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors",
+                location.pathname === item.path && "bg-sidebar-accent text-sidebar-accent-foreground"
+              )}
+            >
+              <span className="inline-flex items-center justify-center">
+                <Icon />
+              </span>
+              <span className="ml-3 text-sm font-medium">{item.title}</span>
+            </Link>
+          );
+        })}
     </nav>
   );
 };
