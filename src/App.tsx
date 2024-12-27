@@ -14,6 +14,7 @@ import Clients from "./pages/Clients";
 import Tenant from "./pages/Tenant";
 import Profile from "./pages/Profile";
 import Forms from "./pages/Forms";
+import Files from "./pages/Files";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSessionContext } from "@supabase/auth-helpers-react";
@@ -157,6 +158,16 @@ const App = () => (
                   <ProtectedRoute>
                     <AppLayout>
                       <Forms />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/files"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Files />
                     </AppLayout>
                   </ProtectedRoute>
                 }
