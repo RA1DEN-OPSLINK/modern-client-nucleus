@@ -7,6 +7,7 @@ import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppLayout } from "./layouts/AppLayout";
+
 import Auth from "./pages/Auth";
 import Index from "./pages/Index";
 import Teams from "./pages/Teams";
@@ -15,9 +16,8 @@ import Tenant from "./pages/Tenant";
 import Profile from "./pages/Profile";
 import Forms from "./pages/Forms";
 import Files from "./pages/Files";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSessionContext } from "@supabase/auth-helpers-react";
+import Map from "./pages/Map";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -168,6 +168,26 @@ const App = () => (
                   <ProtectedRoute>
                     <AppLayout>
                       <Files />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/map"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Map />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Settings />
                     </AppLayout>
                   </ProtectedRoute>
                 }
