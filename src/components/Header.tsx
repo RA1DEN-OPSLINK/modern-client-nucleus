@@ -2,11 +2,16 @@ import { useSessionContext } from "@supabase/auth-helpers-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { 
   UserCircle, 
   Settings, 
-  LogOut, 
+  LogOut,
+  MessageSquare,
+  Bell,
+  Sun,
+  Moon,
+  Folder,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -17,11 +22,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CreateDialog } from "./CreateDialog";
+import { useTheme } from "@/components/theme-provider";
 
 export const Header = () => {
   const { session } = useSessionContext();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
     try {
@@ -51,7 +58,30 @@ export const Header = () => {
       </div>
       
       <div className="ml-auto flex items-center gap-4">
+        <Button variant="ghost" size="icon" className="relative">
+          <MessageSquare className="h-5 w-5" />
+          <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center">
+            3
+          </span>
+        </Button>
+
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center">
+            5
+          </span>
+        </Button>
+
+        <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </Button>
+
+        <Button variant="ghost" size="icon" onClick={() => navigate("/files")}>
+          <Folder className="h-5 w-5" />
+        </Button>
+
         <CreateDialog />
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
