@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { User, Building2, AlertCircle, Search, Plus, Trash2 } from 'lucide-react';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const ClientTeamManagement = () => {
   const { toast } = useToast();
@@ -29,6 +29,8 @@ const ClientTeamManagement = () => {
   const [clients, setClients] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleClientSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +51,8 @@ const ClientTeamManagement = () => {
       address: ''
     });
     setIsFormVisible(false);
+    setSuccessMessage("Client added successfully!");
+    setErrorMessage('');
     toast({
       title: "Success",
       description: "Client added successfully!",
@@ -73,6 +77,8 @@ const ClientTeamManagement = () => {
       department: ''
     });
     setIsFormVisible(false);
+    setSuccessMessage("Team member added successfully!");
+    setErrorMessage('');
     toast({
       title: "Success",
       description: "Team member added successfully!",
@@ -85,6 +91,8 @@ const ClientTeamManagement = () => {
     } else {
       setTeamMembers(teamMembers.filter(member => member.id !== id));
     }
+    setSuccessMessage(`${type === 'client' ? 'Client' : 'Team member'} deleted successfully!`);
+    setErrorMessage('');
     toast({
       title: "Success",
       description: `${type === 'client' ? 'Client' : 'Team member'} deleted successfully!`,
