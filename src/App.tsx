@@ -1,15 +1,16 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { StrictMode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+
 import { AppLayout } from "./layouts/AppLayout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AuthGuard } from "./components/auth/AuthGuard";
-import { StrictMode } from "react";
 
 // Pages
 import Auth from "./pages/Auth";
@@ -23,7 +24,7 @@ import Files from "./pages/Files";
 import Map from "./pages/Map";
 import Settings from "./pages/Settings";
 
-// Initialize QueryClient outside of component to avoid recreation
+// Initialize QueryClient with configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -34,7 +35,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Initialize Supabase client outside of component
+// Initialize Supabase client
 const supabase = createClient(
   "https://qucizswoafsydzcmtxdh.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1Y2l6c3dvYWZzeWR6Y210eGRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ4NDA1NTksImV4cCI6MjA1MDQxNjU1OX0.bHYUA0NDkRY6jLb9h6mNXyMfwOyuuSPf566Q1Afwxcs"
@@ -153,15 +154,15 @@ const App = () => (
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <SessionContextProvider supabaseClient={supabase}>
-        <ThemeProvider defaultTheme="system" storageKey="app-theme">
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+        <BrowserRouter>
+          <ThemeProvider defaultTheme="system" storageKey="app-theme">
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
               <AppRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
-        </ThemeProvider>
+            </TooltipProvider>
+          </ThemeProvider>
+        </BrowserRouter>
       </SessionContextProvider>
     </QueryClientProvider>
   </StrictMode>

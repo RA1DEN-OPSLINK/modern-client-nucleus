@@ -10,14 +10,16 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!isLoading && !session) {
-      // Redirect to auth page while saving the intended destination
+      // Save the current location to redirect back after login
       navigate('/auth', { state: { from: location.pathname } });
     }
   }, [session, isLoading, navigate, location]);
 
+  // Show loading state while checking authentication
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
+  // Only render children if we have a session
   return session ? children : null;
 };
