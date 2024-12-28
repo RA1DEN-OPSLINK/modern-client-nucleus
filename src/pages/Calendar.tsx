@@ -1,9 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { useState } from "react";
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Calendar() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const { toast } = useToast();
+
+  const handleDateClick = (arg: any) => {
+    toast({
+      title: "Date clicked",
+      description: `You clicked on: ${arg.dateStr}`,
+    });
+  };
+
+  const handleEventClick = (arg: any) => {
+    toast({
+      title: "Event clicked",
+      description: `You clicked on: ${arg.event.title}`,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -19,12 +36,33 @@ export default function Calendar() {
           <CardTitle>Calendar</CardTitle>
         </CardHeader>
         <CardContent>
-          <CalendarComponent
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-md border"
-          />
+          <div className="h-[800px]">
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+              }}
+              editable={true}
+              selectable={true}
+              selectMirror={true}
+              dayMaxEvents={true}
+              weekends={true}
+              dateClick={handleDateClick}
+              eventClick={handleEventClick}
+              events={[
+                // Example events - you can replace these with your own data
+                {
+                  title: 'Example Event',
+                  start: new Date(),
+                  allDay: true
+                }
+              ]}
+              height="100%"
+            />
+          </div>
         </CardContent>
       </Card>
     </div>
