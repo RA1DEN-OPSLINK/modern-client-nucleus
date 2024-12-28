@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const ZEPTO_API_KEY = Deno.env.get("ZEPTO_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -42,29 +42,41 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (authError) throw authError;
 
-    // Send welcome email with temporary password
-    const res = await fetch("https://api.resend.com/emails", {
+    // Send welcome email using Zepto Mail
+    const res = await fetch("https://api.zeptomail.ca/v1.1/email", {
       method: "POST",
       headers: {
+        "Accept": "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Authorization": `Zoho-enczapikey ${ZEPTO_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Team Portal <onboarding@resend.dev>",
-        to: [email],
+        from: {
+          address: "support@operations-link.com",
+        },
+        to: [{
+          email_address: {
+            address: email,
+            name: `${firstName} ${lastName}`,
+          },
+        }],
         subject: "Welcome to the Team Portal - Set Up Your Account",
-        html: `
-          <h1>Welcome to the Team Portal, ${firstName}!</h1>
-          <p>Your account has been created. Please use the following temporary password to log in:</p>
-          <p><strong>${temporaryPassword}</strong></p>
-          <p>For security reasons, you will be required to change your password when you first log in.</p>
-          <p>Click here to log in: <a href="${SUPABASE_URL}">Team Portal</a></p>
-          <p>Best regards,<br>The Team</p>
+        htmlbody: `
+          <div>
+            <h1>Welcome to the Team Portal, ${firstName}!</h1>
+            <p>Your account has been created. Please use the following temporary password to log in:</p>
+            <p><strong>${temporaryPassword}</strong></p>
+            <p>For security reasons, you will be required to change your password when you first log in.</p>
+            <p>Click here to log in: <a href="${SUPABASE_URL}">Team Portal</a></p>
+            <p>Best regards,<br>The Team</p>
+          </div>
         `,
       }),
     });
 
     if (!res.ok) {
+      const errorData = await res.json();
+      console.error("Zepto Mail API error:", errorData);
       throw new Error("Failed to send email");
     }
 
