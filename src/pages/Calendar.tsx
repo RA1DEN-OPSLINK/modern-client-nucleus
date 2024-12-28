@@ -31,15 +31,16 @@ interface NewEvent {
 export default function Calendar() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [newEvent, setNewEvent] = useState<NewEvent>({
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
+  const [currentEvent, setCurrentEvent] = useState<NewEvent>({
     title: "",
     description: "",
     start_time: "",
     end_time: "",
     all_day: false,
-    organization_id: "", // Will be set when creating the event
+    organization_id: "", // Will be set when creating/editing the event
   });
 
   // Fetch organization_id
@@ -79,15 +80,8 @@ export default function Calendar() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
-      setIsCreateEventOpen(false);
-      setNewEvent({
-        title: "",
-        description: "",
-        start_time: "",
-        end_time: "",
-        all_day: false,
-        organization_id: "",
-      });
+      setIsEventDialogOpen(false);
+      resetEventForm();
       toast({
         title: "Success",
         description: "Event created successfully",
@@ -102,24 +96,73 @@ export default function Calendar() {
     },
   });
 
+  // Update event mutation
+  const updateEvent = useMutation({
+    mutationFn: async (event: NewEvent & { id: string }) => {
+      const { id, ...eventData } = event;
+      const { data, error } = await supabase
+        .from('calendar_events')
+        .update(eventData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendar-events'] });
+      setIsEventDialogOpen(false);
+      resetEventForm();
+      toast({
+        title: "Success",
+        description: "Event updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update event: " + error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleDateClick = (arg: any) => {
     setSelectedDate(arg.date);
-    setNewEvent(prev => ({
+    setCurrentEvent(prev => ({
       ...prev,
       start_time: `${arg.dateStr}T09:00:00`,
       end_time: `${arg.dateStr}T17:00:00`,
     }));
-    setIsCreateEventOpen(true);
+    setDialogMode('create');
+    setIsEventDialogOpen(true);
   };
 
   const handleEventClick = (arg: any) => {
-    toast({
-      title: arg.event.title,
-      description: arg.event.extendedProps.description || "No description provided",
+    const event = events.find((e: Event) => e.id === arg.event.id);
+    if (event) {
+      setCurrentEvent({
+        ...event,
+        organization_id: orgData?.organization_id || '',
+      });
+      setDialogMode('edit');
+      setIsEventDialogOpen(true);
+    }
+  };
+
+  const resetEventForm = () => {
+    setCurrentEvent({
+      title: "",
+      description: "",
+      start_time: "",
+      end_time: "",
+      all_day: false,
+      organization_id: "",
     });
   };
 
-  const handleCreateEvent = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!orgData?.organization_id) {
       toast({
@@ -129,10 +172,17 @@ export default function Calendar() {
       });
       return;
     }
-    createEvent.mutate({
-      ...newEvent,
-      organization_id: orgData.organization_id
-    });
+
+    const eventWithOrgId = {
+      ...currentEvent,
+      organization_id: orgData.organization_id,
+    };
+
+    if (dialogMode === 'create') {
+      createEvent.mutate(eventWithOrgId);
+    } else {
+      updateEvent.mutate(eventWithOrgId as NewEvent & { id: string });
+    }
   };
 
   return (
@@ -184,11 +234,12 @@ export default function Calendar() {
       </div>
 
       <EventDialog
-        isOpen={isCreateEventOpen}
-        onOpenChange={setIsCreateEventOpen}
-        newEvent={newEvent}
-        setNewEvent={setNewEvent}
-        onSubmit={handleCreateEvent}
+        isOpen={isEventDialogOpen}
+        onOpenChange={setIsEventDialogOpen}
+        event={currentEvent}
+        setEvent={setCurrentEvent}
+        onSubmit={handleSubmit}
+        mode={dialogMode}
       />
     </div>
   );

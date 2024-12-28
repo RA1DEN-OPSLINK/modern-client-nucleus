@@ -3,40 +3,45 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
+interface Event {
+  id?: string;
+  title: string;
+  description: string;
+  start_time: string;
+  end_time: string;
+  all_day: boolean;
+}
+
 interface EventDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  newEvent: {
-    title: string;
-    description: string;
-    start_time: string;
-    end_time: string;
-    all_day: boolean;
-  };
-  setNewEvent: (event: any) => void;
+  event: Event;
+  setEvent: (event: any) => void;
   onSubmit: (e: React.FormEvent) => void;
+  mode: 'create' | 'edit';
 }
 
 export function EventDialog({ 
   isOpen, 
   onOpenChange, 
-  newEvent, 
-  setNewEvent, 
-  onSubmit 
+  event, 
+  setEvent, 
+  onSubmit,
+  mode 
 }: EventDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Event</DialogTitle>
+          <DialogTitle>{mode === 'create' ? 'Create New Event' : 'Edit Event'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="title" className="text-sm font-medium">Title</label>
             <Input
               id="title"
-              value={newEvent.title}
-              onChange={(e) => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
+              value={event.title}
+              onChange={(e) => setEvent(prev => ({ ...prev, title: e.target.value }))}
               required
             />
           </div>
@@ -44,8 +49,8 @@ export function EventDialog({
             <label htmlFor="description" className="text-sm font-medium">Description</label>
             <Textarea
               id="description"
-              value={newEvent.description}
-              onChange={(e) => setNewEvent(prev => ({ ...prev, description: e.target.value }))}
+              value={event.description}
+              onChange={(e) => setEvent(prev => ({ ...prev, description: e.target.value }))}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -54,8 +59,8 @@ export function EventDialog({
               <Input
                 id="start_time"
                 type="datetime-local"
-                value={newEvent.start_time}
-                onChange={(e) => setNewEvent(prev => ({ ...prev, start_time: e.target.value }))}
+                value={event.start_time}
+                onChange={(e) => setEvent(prev => ({ ...prev, start_time: e.target.value }))}
                 required
               />
             </div>
@@ -64,14 +69,14 @@ export function EventDialog({
               <Input
                 id="end_time"
                 type="datetime-local"
-                value={newEvent.end_time}
-                onChange={(e) => setNewEvent(prev => ({ ...prev, end_time: e.target.value }))}
+                value={event.end_time}
+                onChange={(e) => setEvent(prev => ({ ...prev, end_time: e.target.value }))}
                 required
               />
             </div>
           </div>
           <Button type="submit" className="w-full">
-            Create Event
+            {mode === 'create' ? 'Create Event' : 'Update Event'}
           </Button>
         </form>
       </DialogContent>
