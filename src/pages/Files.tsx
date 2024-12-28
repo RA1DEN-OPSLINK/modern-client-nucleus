@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { FolderPlus, ArrowLeft, Upload } from "lucide-react";
 import { useSessionContext } from "@supabase/auth-helpers-react";
-import { FileCard } from "@/components/files/FileCard";
-import { FolderCard } from "@/components/files/FolderCard";
 import { CreateFolderDialog } from "@/components/files/CreateFolderDialog";
+import { FileList } from "@/components/files/FileList";
+import { FolderBreadcrumb } from "@/components/files/FolderBreadcrumb";
 
 export default function Files() {
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [folderPath, setFolderPath] = useState([{ id: null, name: "Files" }]);
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState<File[]>([]);
   const { toast } = useToast();
@@ -32,6 +33,43 @@ export default function Files() {
       return data;
     },
   });
+
+  // Fetch current folder details
+  const { data: currentFolder } = useQuery({
+    queryKey: ["folder", currentFolderId],
+    enabled: !!currentFolderId && !!profile?.organization_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("folders")
+        .select("*, parent:parent_id(*)")
+        .eq("id", currentFolderId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Update folder path when current folder changes
+  const updateFolderPath = useCallback(async (folder: any) => {
+    if (!folder) {
+      setFolderPath([{ id: null, name: "Files" }]);
+      return;
+    }
+
+    const newPath = [{ id: null, name: "Files" }];
+    let currentFolder = folder;
+
+    while (currentFolder) {
+      newPath.unshift({
+        id: currentFolder.id,
+        name: currentFolder.name,
+      });
+      currentFolder = currentFolder.parent;
+    }
+
+    setFolderPath(newPath);
+  }, []);
 
   // Fetch folders
   const { data: folders, isLoading: isLoadingFolders } = useQuery({
@@ -65,7 +103,6 @@ export default function Files() {
     },
   });
 
-  // Create folder mutation
   const createFolder = useMutation({
     mutationFn: async (name: string) => {
       if (!profile?.organization_id) {
@@ -233,6 +270,24 @@ export default function Files() {
     }
   };
 
+  // Handle folder navigation
+  const handleFolderNavigation = async (folderId: string | null) => {
+    setCurrentFolderId(folderId);
+    if (!folderId) {
+      setFolderPath([{ id: null, name: "Files" }]);
+    } else {
+      const { data } = await supabase
+        .from("folders")
+        .select("*, parent:parent_id(*)")
+        .eq("id", folderId)
+        .single();
+      
+      if (data) {
+        updateFolderPath(data);
+      }
+    }
+  };
+
   // Loading states
   if (isLoadingProfile) {
     return <div className="p-8 text-center">Loading profile...</div>;
@@ -245,17 +300,12 @@ export default function Files() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {currentFolderId && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setCurrentFolderId(null)}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          )}
+        <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">Files</h1>
+          <FolderBreadcrumb 
+            path={folderPath}
+            onNavigate={handleFolderNavigation}
+          />
         </div>
         <div className="flex items-center gap-2">
           <Button 
@@ -281,29 +331,15 @@ export default function Files() {
         </div>
       </div>
 
-      {(isLoadingFolders || isLoadingFiles) ? (
-        <div className="text-center">Loading...</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {folders?.map((folder) => (
-            <FolderCard
-              key={folder.id}
-              folder={folder}
-              onSelect={setCurrentFolderId}
-              onDelete={(id) => deleteFolder.mutate(id)}
-            />
-          ))}
-
-          {files?.map((file) => (
-            <FileCard
-              key={file.id}
-              file={file}
-              onDownload={handleFileDownload}
-              onDelete={(id) => deleteFile.mutate(id)}
-            />
-          ))}
-        </div>
-      )}
+      <FileList
+        folders={folders || []}
+        files={files || []}
+        onFolderSelect={handleFolderNavigation}
+        onFolderDelete={(id) => deleteFolder.mutate(id)}
+        onFileDownload={handleFileDownload}
+        onFileDelete={(id) => deleteFile.mutate(id)}
+        isLoading={isLoadingFolders || isLoadingFiles}
+      />
 
       <CreateFolderDialog
         open={isCreateFolderOpen}
