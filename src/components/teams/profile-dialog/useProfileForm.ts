@@ -64,11 +64,11 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setIsLoading(true);
 
     try {
-      // Create the profile with a generated UUID
-      const { data: uuidData, error: uuidError } = await supabase
+      // Create the profile
+      const { error: profileError } = await supabase
         .from('profiles')
         .insert({
-          id: crypto.randomUUID(), // Generate a UUID for the profile
+          id: crypto.randomUUID(),
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone,
@@ -83,14 +83,13 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
         .select()
         .single();
 
-      if (uuidError) throw uuidError;
-      if (!uuidData) throw new Error('Failed to create profile');
+      if (profileError) throw profileError;
 
       // Add team member to selected teams if any teams were selected
-      if (formData.teamIds.length > 0 && uuidData) {
+      if (formData.teamIds.length > 0) {
         const teamMembers = formData.teamIds.map(teamId => ({
           team_id: teamId,
-          profile_id: uuidData.id,
+          profile_id: profileError?.id,
         }));
 
         const { error: teamMemberError } = await supabase
