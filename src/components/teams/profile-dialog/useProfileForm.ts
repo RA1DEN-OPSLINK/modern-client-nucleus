@@ -12,7 +12,6 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: "",
     lastName: "",
-    email: "",
     phone: "",
     city: "",
     postalCode: "",
@@ -31,7 +30,6 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setFormData({
       firstName: "",
       lastName: "",
-      email: "",
       phone: "",
       city: "",
       postalCode: "",
@@ -54,11 +52,11 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
       return;
     }
 
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    if (!formData.firstName || !formData.lastName) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "First name, last name, and email are required",
+        description: "First name and last name are required",
       });
       return;
     }
@@ -73,7 +71,6 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
           id: crypto.randomUUID(),
           first_name: formData.firstName,
           last_name: formData.lastName,
-          email: formData.email,
           phone: formData.phone,
           city: formData.city,
           postal_code: formData.postalCode,
