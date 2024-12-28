@@ -8,11 +8,15 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trash2, UserPlus } from "lucide-react";
-import { ProfilesTable } from "@/integrations/supabase/types/tables";
 
 interface TeamMember {
   id: string;
-  profiles: ProfilesTable['Row'];
+  profiles: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+  };
 }
 
 interface ManageTeamMembersDialogProps {

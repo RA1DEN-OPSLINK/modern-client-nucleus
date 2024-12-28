@@ -12,10 +12,28 @@ interface TeamsTableProps {
   organizationId?: string;
 }
 
+interface TeamMember {
+  profiles: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+    role: string;
+  };
+}
+
+interface Team {
+  id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  team_members: TeamMember[];
+}
+
 export function TeamsTable({ organizationId }: TeamsTableProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedTeam, setSelectedTeam] = useState<any>(null);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [isManagingMembers, setIsManagingMembers] = useState(false);
   const [isEditingTeam, setIsEditingTeam] = useState(false);
 
@@ -48,7 +66,7 @@ export function TeamsTable({ organizationId }: TeamsTableProps) {
         return [];
       }
 
-      return data;
+      return data as Team[];
     },
   });
 

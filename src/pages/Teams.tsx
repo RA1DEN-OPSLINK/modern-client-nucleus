@@ -5,7 +5,7 @@ import { useSessionContext } from "@supabase/auth-helpers-react";
 import { CreateTeamDialog } from "@/components/CreateTeamDialog";
 import { TeamHeader } from "@/components/teams/TeamHeader";
 import { TeamsTable } from "@/components/teams/TeamsTable";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Teams() {
   const { toast } = useToast();
