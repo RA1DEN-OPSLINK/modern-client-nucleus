@@ -30,9 +30,22 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
     if (!organizationId) return;
 
     setIsLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No authenticated user found",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     const { error } = await supabase
       .from("profiles")
       .insert({
+        id: crypto.randomUUID(), // Generate a new UUID for the profile
         first_name: firstName,
         last_name: lastName,
         phone,
