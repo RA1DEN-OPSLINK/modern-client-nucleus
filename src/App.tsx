@@ -18,8 +18,39 @@ const App = () => {
         }
         if (!session) {
           console.log("No active session found");
-        } else {
-          console.log("Session initialized successfully");
+          return;
+        }
+        
+        console.log("Session initialized successfully");
+        
+        // Verify the user has a profile
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          if (profileError.code === 'PGRST116') {
+            console.log("Profile not found for user:", session.user.id);
+            toast({
+              variant: "destructive",
+              title: "Profile Error",
+              description: "Your user profile could not be found. Please contact support.",
+            });
+          } else {
+            throw profileError;
+          }
+        }
+
+        if (!profile) {
+          console.warn("No profile found for user:", session.user.id);
+          toast({
+            variant: "destructive",
+            title: "Profile Error",
+            description: "Your user profile could not be found. Please contact support.",
+          });
         }
       } catch (error) {
         console.error("Session initialization failed:", error);
@@ -40,17 +71,16 @@ const App = () => {
         
         if (event === 'SIGNED_OUT') {
           console.log('User signed out, clearing session');
-          // Clear any session-related state or cached data
-          localStorage.removeItem('app-auth');
-        } else if (event === 'SIGNED_IN') {
+          localStorage.clear(); // Clear all local storage data
+        } else if (event === 'SIGNED_IN' && session?.user) {
           console.log('User signed in, session established');
           try {
             // Verify the user has a profile
             const { data: profile, error: profileError } = await supabase
               .from("profiles")
-              .select("role")
-              .eq("id", session?.user?.id)
-              .maybeSingle();
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
 
             if (profileError) {
               console.error("Error fetching profile:", profileError);
@@ -58,7 +88,7 @@ const App = () => {
             }
 
             if (!profile) {
-              console.warn("No profile found for user:", session?.user?.id);
+              console.warn("No profile found for user:", session.user.id);
               toast({
                 variant: "destructive",
                 title: "Profile Error",
