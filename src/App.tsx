@@ -1,4 +1,4 @@
-import { StrictMode, useEffect } from "react";
+import { useEffect } from "react";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { AppRoutes } from "@/routes";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,11 +37,9 @@ const App = () => {
   }, []);
 
   return (
-    <StrictMode>
-      <AppProviders>
-        <AppRoutes />
-      </AppProviders>
-    </StrictMode>
+    <AppProviders>
+      <AppRoutes />
+    </AppProviders>
   );
 };
 

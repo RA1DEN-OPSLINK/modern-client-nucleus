@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { StrictMode } from "react";
 
 // Initialize QueryClient with configuration
 const queryClient = new QueryClient({
@@ -24,21 +25,23 @@ interface AppProvidersProps {
 
 export const AppProviders = ({ children }: AppProvidersProps) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <SessionContextProvider 
-        supabaseClient={supabase}
-        initialSession={null}
-      >
-        <BrowserRouter>
-          <ThemeProvider defaultTheme="system" storageKey="app-theme">
-            <TooltipProvider>
-              {children}
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </ThemeProvider>
-        </BrowserRouter>
-      </SessionContextProvider>
-    </QueryClientProvider>
+    <StrictMode>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <SessionContextProvider 
+            supabaseClient={supabase}
+            initialSession={null}
+          >
+            <ThemeProvider defaultTheme="system" storageKey="app-theme">
+              <TooltipProvider>
+                {children}
+                <Toaster />
+                <Sonner />
+              </TooltipProvider>
+            </ThemeProvider>
+          </SessionContextProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </StrictMode>
   );
 };
