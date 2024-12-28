@@ -14,7 +14,12 @@ const SidebarToggle = () => {
   const isCollapsed = state === "collapsed";
 
   return (
-    <SidebarTrigger className="ml-auto">
+    <SidebarTrigger 
+      className={cn(
+        "transition-opacity duration-200",
+        isCollapsed ? "opacity-100" : "opacity-0 pointer-events-none"
+      )}
+    >
       <ChevronRight className={cn(
         "h-4 w-4 transition-transform",
         isCollapsed ? "rotate-0" : "rotate-180"
