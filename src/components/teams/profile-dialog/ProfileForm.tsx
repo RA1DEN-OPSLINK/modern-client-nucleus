@@ -59,6 +59,16 @@ export function ProfileForm({
         />
       </div>
       <div className="space-y-2">
+        <Label htmlFor="email">Email Address *</Label>
+        <Input
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ email: e.target.value })}
+          required
+        />
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="address">Address</Label>
         <Input
           id="address"
@@ -116,7 +126,7 @@ export function ProfileForm({
       <div className="space-y-2">
         <Label htmlFor="teams">Assign to Teams</Label>
         <Select
-          value={formData.teamIds[0]} // For now, we'll support single team selection
+          value={formData.teamIds[0]}
           onValueChange={(value) => setFormData({ teamIds: [value] })}
         >
           <SelectTrigger>

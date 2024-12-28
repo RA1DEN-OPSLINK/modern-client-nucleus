@@ -12,6 +12,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: "",
     lastName: "",
+    email: "",
     phone: "",
     city: "",
     postalCode: "",
@@ -30,6 +31,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setFormData({
       firstName: "",
       lastName: "",
+      email: "",
       phone: "",
       city: "",
       postalCode: "",
@@ -52,11 +54,11 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
       return;
     }
 
-    if (!formData.firstName || !formData.lastName) {
+    if (!formData.firstName || !formData.lastName || !formData.email) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "First name and last name are required",
+        description: "First name, last name, and email are required",
       });
       return;
     }
@@ -65,12 +67,13 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
 
     try {
       // Create the profile
-      const { error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .insert({
           id: crypto.randomUUID(),
           first_name: formData.firstName,
           last_name: formData.lastName,
+          email: formData.email,
           phone: formData.phone,
           city: formData.city,
           postal_code: formData.postalCode,
@@ -84,12 +87,13 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
         .single();
 
       if (profileError) throw profileError;
+      if (!profileData) throw new Error('Failed to create profile');
 
       // Add team member to selected teams if any teams were selected
       if (formData.teamIds.length > 0) {
         const teamMembers = formData.teamIds.map(teamId => ({
           team_id: teamId,
-          profile_id: profileError?.id,
+          profile_id: profileData.id,
         }));
 
         const { error: teamMemberError } = await supabase

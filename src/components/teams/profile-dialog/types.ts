@@ -9,6 +9,7 @@ export interface ProfileFormData {
   address: string;
   teamIds: string[];
   role: 'team' | 'manager';
+  email: string;
 }
 
 export interface CreateProfileDialogProps {
