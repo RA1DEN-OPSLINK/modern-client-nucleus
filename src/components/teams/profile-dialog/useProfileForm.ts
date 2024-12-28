@@ -70,16 +70,9 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
 
     try {
       // Generate a UUID for the new profile
-      const { data, error: uuidError } = await supabase.rpc<UUIDResponse, never>('generate_uuid');
-      
-      if (uuidError) throw uuidError;
-      if (!data) throw new Error('Failed to generate UUID');
-
-      // Create the profile
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
+      const { data: uuidData, error: uuidError } = await supabase
+        .from('profiles')
         .insert({
-          id: data.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone,
@@ -94,13 +87,14 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
         .select()
         .single();
 
-      if (profileError) throw profileError;
+      if (uuidError) throw uuidError;
+      if (!uuidData) throw new Error('Failed to create profile');
 
       // Add team member to selected teams if any teams were selected
-      if (formData.teamIds.length > 0 && profile) {
+      if (formData.teamIds.length > 0 && uuidData) {
         const teamMembers = formData.teamIds.map(teamId => ({
           team_id: teamId,
-          profile_id: profile.id,
+          profile_id: uuidData.id,
         }));
 
         const { error: teamMemberError } = await supabase
