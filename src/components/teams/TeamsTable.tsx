@@ -32,6 +32,7 @@ export function TeamsTable({ organizationId }: TeamsTableProps) {
               id,
               first_name,
               last_name,
+              avatar_url,
               role
             )
           )
@@ -65,7 +66,7 @@ export function TeamsTable({ organizationId }: TeamsTableProps) {
       });
 
       queryClient.invalidateQueries({ queryKey: ["teams"] });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error deleting team",

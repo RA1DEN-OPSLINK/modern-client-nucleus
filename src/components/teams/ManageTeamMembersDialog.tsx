@@ -86,7 +86,7 @@ export function ManageTeamMembersDialog({
 
       queryClient.invalidateQueries({ queryKey: ["team-members", teamId] });
       setEmail("");
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error adding team member",
@@ -109,7 +109,7 @@ export function ManageTeamMembersDialog({
       });
 
       queryClient.invalidateQueries({ queryKey: ["team-members", teamId] });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error removing team member",
