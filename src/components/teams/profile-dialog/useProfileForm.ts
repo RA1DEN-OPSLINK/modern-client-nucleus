@@ -64,21 +64,10 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setIsLoading(true);
 
     try {
-      // First create an auth user
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}@example.com`,
-        password: "temporary-password-123", // You should implement a secure password generation
-        email_confirm: true,
-      });
-
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Failed to create user");
-
-      // Then create the profile
-      const { error: profileError } = await supabase
+      // First create the profile
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .insert({
-          id: authData.user.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone,
@@ -89,15 +78,17 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
           role: formData.role,
           avatar_url: formData.avatarUrl,
           address: formData.address,
-        });
+        })
+        .select()
+        .single();
 
       if (profileError) throw profileError;
 
-      // Add team member to selected teams
-      if (formData.teamIds.length > 0) {
+      // Add team member to selected teams if any teams were selected
+      if (formData.teamIds.length > 0 && profile) {
         const teamMembers = formData.teamIds.map(teamId => ({
           team_id: teamId,
-          profile_id: authData.user.id,
+          profile_id: profile.id,
         }));
 
         const { error: teamMemberError } = await supabase
