@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Users, Building2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { TeamsTable } from "@/components/TeamsTable";
 import { ClientsTable } from "@/components/ClientsTable";
 import { CreateTeamDialog } from "@/components/CreateTeamDialog";
@@ -16,7 +16,7 @@ export default function Tenant() {
   const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
   const [isCreateClientOpen, setIsCreateClientOpen] = useState(false);
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -62,6 +62,16 @@ export default function Tenant() {
       };
     },
   });
+
+  // Don't render anything while loading profile
+  if (isProfileLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Don't render if no profile or organization_id
+  if (!profile?.organization_id) {
+    return <div>Error: No organization found</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -124,22 +134,22 @@ export default function Tenant() {
         </div>
 
         <TabsContent value="teams" className="space-y-4">
-          <TeamsTable organizationId={profile?.organization_id} />
+          <TeamsTable organizationId={profile.organization_id} />
         </TabsContent>
         <TabsContent value="clients" className="space-y-4">
-          <ClientsTable organizationId={profile?.organization_id} />
+          <ClientsTable organizationId={profile.organization_id} />
         </TabsContent>
       </Tabs>
 
       <CreateTeamDialog
         open={isCreateTeamOpen}
         onOpenChange={setIsCreateTeamOpen}
-        organizationId={profile?.organization_id}
+        organizationId={profile.organization_id}
       />
       <CreateClientDialog
         open={isCreateClientOpen}
         onOpenChange={setIsCreateClientOpen}
-        organizationId={profile?.organization_id}
+        organizationId={profile.organization_id}
       />
     </div>
   );
