@@ -125,9 +125,9 @@ export const useFileMutations = () => {
   });
 
   return {
-    createFolder,
-    editFolder,
-    deleteFolder,
-    deleteFile,
+    createFolder: (params: CreateFolderParams) => createFolder.mutate(params),
+    editFolder: (params: EditFolderParams) => editFolder.mutate(params),
+    deleteFolder: (id: string) => deleteFolder.mutate(id),
+    deleteFile: (id: string) => deleteFile.mutate(id),
   };
 };

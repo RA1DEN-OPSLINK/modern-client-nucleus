@@ -102,31 +102,37 @@ export default function Files() {
         folders={folders || []}
         files={files || []}
         onFolderSelect={handleFolderNavigation}
-        onFolderDelete={deleteFolder.mutate}
+        onFolderDelete={deleteFolder}
         onFolderEdit={setEditingFolder}
         onFileDownload={handleFileDownload}
-        onFileDelete={deleteFile.mutate}
+        onFileDelete={deleteFile}
         isLoading={isLoading}
       />
 
       <CreateFolderDialog
         open={isCreateFolderOpen}
         onOpenChange={setIsCreateFolderOpen}
-        onCreateFolder={(name) => createFolder.mutate({ 
-          name, 
-          organizationId: profile.organization_id,
-          parentId: currentFolderId 
-        })}
+        onCreateFolder={(name) => {
+          if (!profile?.organization_id) return;
+          createFolder({
+            name,
+            organizationId: profile.organization_id,
+            parentId: currentFolderId
+          });
+        }}
       />
 
       <EditFolderDialog
         open={!!editingFolder}
         onOpenChange={(open) => !open && setEditingFolder(null)}
-        onEditFolder={(id, name) => editFolder.mutate({ 
-          id, 
-          name, 
-          organizationId: profile.organization_id 
-        })}
+        onEditFolder={(id, name) => {
+          if (!profile?.organization_id) return;
+          editFolder({
+            id,
+            name,
+            organizationId: profile.organization_id
+          });
+        }}
         folder={editingFolder}
       />
 
