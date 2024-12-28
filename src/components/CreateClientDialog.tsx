@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { ClientBasicInfo } from "./clients/ClientBasicInfo";
+import { ClientAddress } from "./clients/ClientAddress";
+import { CompanyInfo } from "./clients/CompanyInfo";
+import { ClientAvatar } from "./clients/ClientAvatar";
 
 interface CreateClientDialogProps {
   open: boolean;
@@ -27,9 +29,11 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
   const [companyCity, setCompanyCity] = useState("");
   const [companyPostalCode, setCompanyPostalCode] = useState("");
   const [companyCountry, setCompanyCountry] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const clientId = crypto.randomUUID();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +43,7 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
     const { error } = await supabase
       .from("clients")
       .insert({
+        id: clientId,
         name,
         email,
         phone,
@@ -54,6 +59,7 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
         company_country: companyCountry,
         organization_id: organizationId,
         status: "lead",
+        avatar_url: avatarUrl,
       });
 
     setIsLoading(false);
@@ -72,8 +78,11 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
     });
 
     queryClient.invalidateQueries({ queryKey: ["clients"] });
-    queryClient.invalidateQueries({ queryKey: ["tenant-stats"] });
     onOpenChange(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
     setName("");
     setEmail("");
     setPhone("");
@@ -87,6 +96,7 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
     setCompanyCity("");
     setCompanyPostalCode("");
     setCompanyCountry("");
+    setAvatarUrl(null);
   };
 
   return (
@@ -95,125 +105,61 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
         <DialogHeader>
           <DialogTitle>Add New Client</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Client Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <ClientAvatar 
+            clientId={clientId}
+            name={name}
+            onUploadComplete={setAvatarUrl}
+          />
+          
+          <div className="space-y-6">
+            <ClientBasicInfo
+              name={name}
+              email={email}
+              phone={phone}
+              setName={setName}
+              setEmail={setEmail}
+              setPhone={setPhone}
+            />
+
+            <ClientAddress
+              address={address}
+              city={city}
+              postalCode={postalCode}
+              country={country}
+              setAddress={setAddress}
+              setCity={setCity}
+              setPostalCode={setPostalCode}
+              setCountry={setCountry}
+            />
+
+            <CompanyInfo
+              companyName={companyName}
+              companyPhone={companyPhone}
+              companyAddress={companyAddress}
+              companyCity={companyCity}
+              companyPostalCode={companyPostalCode}
+              companyCountry={companyCountry}
+              setCompanyName={setCompanyName}
+              setCompanyPhone={setCompanyPhone}
+              setCompanyAddress={setCompanyAddress}
+              setCompanyCity={setCompanyCity}
+              setCompanyPostalCode={setCompanyPostalCode}
+              setCompanyCountry={setCompanyCountry}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
-            <Input
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="postalCode">Postal/Zip Code</Label>
-            <Input
-              id="postalCode"
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="country">Country</Label>
-            <Input
-              id="country"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyName">Company Name</Label>
-            <Input
-              id="companyName"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyPhone">Company Phone</Label>
-            <Input
-              id="companyPhone"
-              type="tel"
-              value={companyPhone}
-              onChange={(e) => setCompanyPhone(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyAddress">Company Address</Label>
-            <Input
-              id="companyAddress"
-              value={companyAddress}
-              onChange={(e) => setCompanyAddress(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyCity">Company City</Label>
-            <Input
-              id="companyCity"
-              value={companyCity}
-              onChange={(e) => setCompanyCity(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyPostalCode">Company Postal/Zip Code</Label>
-            <Input
-              id="companyPostalCode"
-              value={companyPostalCode}
-              onChange={(e) => setCompanyPostalCode(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyCountry">Company Country</Label>
-            <Input
-              id="companyCountry"
-              value={companyCountry}
-              onChange={(e) => setCompanyCountry(e.target.value)}
-            />
-          </div>
+
           <div className="flex justify-end space-x-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isLoading}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              Add Client
+              {isLoading ? "Adding Client..." : "Add Client"}
             </Button>
           </div>
         </form>
