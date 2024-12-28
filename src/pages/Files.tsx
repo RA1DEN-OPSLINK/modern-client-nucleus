@@ -18,7 +18,7 @@ export default function Files() {
   const { session } = useSessionContext();
 
   // Get user's organization_id
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -28,12 +28,13 @@ export default function Files() {
         .single();
 
       if (error) throw error;
+      if (!data?.organization_id) throw new Error("No organization found");
       return data;
     },
   });
 
   // Fetch folders
-  const { data: folders } = useQuery({
+  const { data: folders, isLoading: isLoadingFolders } = useQuery({
     queryKey: ["folders", currentFolderId, profile?.organization_id],
     enabled: !!profile?.organization_id,
     queryFn: async () => {
@@ -49,7 +50,7 @@ export default function Files() {
   });
 
   // Fetch files
-  const { data: files } = useQuery({
+  const { data: files, isLoading: isLoadingFiles } = useQuery({
     queryKey: ["files", currentFolderId, profile?.organization_id],
     enabled: !!profile?.organization_id,
     queryFn: async () => {
@@ -67,10 +68,14 @@ export default function Files() {
   // Create folder mutation
   const createFolder = useMutation({
     mutationFn: async (name: string) => {
+      if (!profile?.organization_id) {
+        throw new Error("No organization found");
+      }
+
       const { data, error } = await supabase.from("folders").insert({
         name,
         parent_id: currentFolderId,
-        organization_id: profile?.organization_id,
+        organization_id: profile.organization_id,
       });
 
       if (error) throw error;
@@ -145,7 +150,14 @@ export default function Files() {
   // Handle file upload
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files || !profile?.organization_id) return;
+    if (!files || !profile?.organization_id) {
+      toast({
+        variant: "destructive",
+        title: "Error uploading file",
+        description: "No organization found or no files selected",
+      });
+      return;
+    }
 
     setUploadingFiles(Array.from(files));
 
@@ -221,6 +233,15 @@ export default function Files() {
     }
   };
 
+  // Loading states
+  if (isLoadingProfile) {
+    return <div className="p-8 text-center">Loading profile...</div>;
+  }
+
+  if (!profile?.organization_id) {
+    return <div className="p-8 text-center">No organization found. Please contact support.</div>;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -237,7 +258,10 @@ export default function Files() {
           <h1 className="text-3xl font-bold tracking-tight">Files</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={() => setIsCreateFolderOpen(true)}>
+          <Button 
+            onClick={() => setIsCreateFolderOpen(true)}
+            disabled={!profile?.organization_id}
+          >
             <FolderPlus className="mr-2 h-4 w-4" />
             New Folder
           </Button>
@@ -247,8 +271,9 @@ export default function Files() {
               multiple
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleFileUpload}
+              disabled={!profile?.organization_id}
             />
-            <Button>
+            <Button disabled={!profile?.organization_id}>
               <Upload className="mr-2 h-4 w-4" />
               Upload Files
             </Button>
@@ -256,25 +281,29 @@ export default function Files() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {folders?.map((folder) => (
-          <FolderCard
-            key={folder.id}
-            folder={folder}
-            onSelect={setCurrentFolderId}
-            onDelete={(id) => deleteFolder.mutate(id)}
-          />
-        ))}
+      {(isLoadingFolders || isLoadingFiles) ? (
+        <div className="text-center">Loading...</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {folders?.map((folder) => (
+            <FolderCard
+              key={folder.id}
+              folder={folder}
+              onSelect={setCurrentFolderId}
+              onDelete={(id) => deleteFolder.mutate(id)}
+            />
+          ))}
 
-        {files?.map((file) => (
-          <FileCard
-            key={file.id}
-            file={file}
-            onDownload={handleFileDownload}
-            onDelete={(id) => deleteFile.mutate(id)}
-          />
-        ))}
-      </div>
+          {files?.map((file) => (
+            <FileCard
+              key={file.id}
+              file={file}
+              onDownload={handleFileDownload}
+              onDelete={(id) => deleteFile.mutate(id)}
+            />
+          ))}
+        </div>
+      )}
 
       <CreateFolderDialog
         open={isCreateFolderOpen}
