@@ -102,10 +102,10 @@ export default function Files() {
         folders={folders || []}
         files={files || []}
         onFolderSelect={handleFolderNavigation}
-        onFolderDelete={(id) => deleteFolder.mutate(id)}
+        onFolderDelete={deleteFolder.mutate}
         onFolderEdit={setEditingFolder}
         onFileDownload={handleFileDownload}
-        onFileDelete={(id) => deleteFile.mutate(id)}
+        onFileDelete={deleteFile.mutate}
         isLoading={isLoading}
       />
 

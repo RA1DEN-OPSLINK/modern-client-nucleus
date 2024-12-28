@@ -2,12 +2,24 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+interface CreateFolderParams {
+  name: string;
+  organizationId: string;
+  parentId: string | null;
+}
+
+interface EditFolderParams {
+  id: string;
+  name: string;
+  organizationId: string;
+}
+
 export const useFileMutations = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const createFolder = useMutation({
-    mutationFn: async ({ name, organizationId, parentId }: { name: string; organizationId: string; parentId: string | null }) => {
+    mutationFn: async ({ name, organizationId, parentId }: CreateFolderParams) => {
       const { data, error } = await supabase.from("folders").insert({
         name,
         parent_id: parentId,
@@ -34,7 +46,7 @@ export const useFileMutations = () => {
   });
 
   const editFolder = useMutation({
-    mutationFn: async ({ id, name, organizationId }: { id: string; name: string; organizationId: string }) => {
+    mutationFn: async ({ id, name, organizationId }: EditFolderParams) => {
       const { data, error } = await supabase
         .from("folders")
         .update({ name })
