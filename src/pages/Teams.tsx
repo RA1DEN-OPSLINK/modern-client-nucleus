@@ -15,31 +15,42 @@ export default function Teams() {
   const { toast } = useToast();
   const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
   const [isCreateProfileOpen, setIsCreateProfileOpen] = useState(false);
-  const { session } = useSessionContext();
+  const { session, isLoading: isSessionLoading } = useSessionContext();
 
-  const { data: profile, isLoading, error } = useQuery({
-    queryKey: ["profile"],
-    enabled: !!session?.user.id,
+  const { data: profile, isLoading: isProfileLoading, error } = useQuery({
+    queryKey: ["profile", session?.user?.id],
+    enabled: !!session?.user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: profile, error } = await supabase
         .from("profiles")
         .select("*, organizations(*)")
-        .eq("id", session?.user.id)
+        .eq("id", session?.user?.id)
         .maybeSingle();
 
       if (error) {
         console.error("Error fetching profile:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch profile data. Please try again.",
+        });
         throw error;
       }
       
-      if (!data) {
+      if (!profile) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Profile not found. Please contact support.",
+        });
         throw new Error("Profile not found");
       }
 
-      return data;
+      return profile;
     },
   });
 
+  const isLoading = isSessionLoading || isProfileLoading;
   const canManageTeams = profile?.role === "tenant" || profile?.role === "manager";
 
   if (isLoading) {
@@ -82,9 +93,11 @@ export default function Teams() {
       />
 
       <div className="flex justify-end">
-        <Button onClick={() => setIsCreateProfileOpen(true)}>
-          Add Team Member
-        </Button>
+        {canManageTeams && (
+          <Button onClick={() => setIsCreateProfileOpen(true)}>
+            Add Team Member
+          </Button>
+        )}
       </div>
 
       <TeamsTable organizationId={profile.organization_id} />
