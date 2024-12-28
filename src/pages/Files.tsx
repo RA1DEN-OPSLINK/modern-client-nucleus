@@ -170,7 +170,9 @@ export default function Files() {
 
         if (dbError) throw dbError;
 
-        queryClient.invalidateQueries({ queryKey: ["files"] });
+        // Invalidate queries after successful upload
+        await queryClient.invalidateQueries({ queryKey: ["files"] });
+        
         toast({
           title: `${file.name} uploaded successfully`,
         });
@@ -184,6 +186,8 @@ export default function Files() {
     }
 
     setUploadingFiles([]);
+    // Clear the input value to allow uploading the same file again
+    event.target.value = '';
   };
 
   // Handle file download
@@ -195,14 +199,19 @@ export default function Files() {
 
       if (error) throw error;
 
-      const url = URL.createObjectURL(data);
+      // Create a new blob URL for each download
+      const blob = new Blob([data], { type: file.mime_type });
+      const url = URL.createObjectURL(blob);
+      
       const link = document.createElement("a");
       link.href = url;
       link.download = file.name;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      
+      // Clean up the blob URL after download starts
+      setTimeout(() => URL.revokeObjectURL(url), 100);
     } catch (error: any) {
       toast({
         variant: "destructive",
