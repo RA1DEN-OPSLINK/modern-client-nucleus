@@ -1,19 +1,17 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { ClientBasicInfo } from "./clients/ClientBasicInfo";
 import { ClientAddress } from "./clients/ClientAddress";
 import { CompanyInfo } from "./clients/CompanyInfo";
 import { ClientAvatar } from "./clients/ClientAvatar";
 import { BillingAddress } from "./clients/BillingAddress";
+import { useCreateClient } from "@/hooks/useCreateClient";
 
 interface CreateClientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  organizationId?: string;
+  organizationId: string;
 }
 
 export function CreateClientDialog({ open, onOpenChange, organizationId }: CreateClientDialogProps) {
@@ -31,88 +29,12 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
   const [companyPostalCode, setCompanyPostalCode] = useState("");
   const [companyCountry, setCompanyCountry] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [separateBilling, setSeparateBilling] = useState(false);
   const [billingAddress, setBillingAddress] = useState("");
   const [billingCity, setBillingCity] = useState("");
   const [billingPostalCode, setBillingPostalCode] = useState("");
   const [billingCountry, setBillingCountry] = useState("");
   const [billingPhone, setBillingPhone] = useState("");
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!organizationId) {
-      toast({
-        variant: "destructive",
-        title: "Error creating client",
-        description: "Organization ID is required",
-      });
-      return;
-    }
-
-    if (!name) {
-      toast({
-        variant: "destructive",
-        title: "Error creating client",
-        description: "Client name is required",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase
-        .from("clients")
-        .insert({
-          organization_id: organizationId,
-          name,
-          email,
-          phone,
-          address,
-          city,
-          postal_code: postalCode,
-          country,
-          company_name: companyName,
-          company_phone: companyPhone,
-          company_address: companyAddress,
-          company_city: companyCity,
-          company_postal_code: companyPostalCode,
-          company_country: companyCountry,
-          status: "lead",
-          avatar_url: avatarUrl,
-          billing_address: separateBilling ? billingAddress : address,
-          billing_city: separateBilling ? billingCity : city,
-          billing_postal_code: separateBilling ? billingPostalCode : postalCode,
-          billing_country: separateBilling ? billingCountry : country,
-          billing_phone: separateBilling ? billingPhone : phone,
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Client created successfully",
-      });
-
-      // Invalidate and refetch clients data
-      await queryClient.invalidateQueries({ queryKey: ["clients"] });
-      
-      // Reset form and close dialog
-      resetForm();
-      onOpenChange(false);
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error creating client",
-        description: error.message,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const resetForm = () => {
     setName("");
@@ -135,6 +57,37 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
     setBillingPostalCode("");
     setBillingCountry("");
     setBillingPhone("");
+  };
+
+  const { createClient, isLoading } = useCreateClient(organizationId, () => {
+    resetForm();
+    onOpenChange(false);
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await createClient({
+      name,
+      email,
+      phone,
+      address,
+      city,
+      postalCode,
+      country,
+      companyName,
+      companyPhone,
+      companyAddress,
+      companyCity,
+      companyPostalCode,
+      companyCountry,
+      avatarUrl,
+      separateBilling,
+      billingAddress,
+      billingCity,
+      billingPostalCode,
+      billingCountry,
+      billingPhone,
+    });
   };
 
   return (
