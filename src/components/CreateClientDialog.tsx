@@ -37,6 +37,7 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
   const [billingCity, setBillingCity] = useState("");
   const [billingPostalCode, setBillingPostalCode] = useState("");
   const [billingCountry, setBillingCountry] = useState("");
+  const [billingPhone, setBillingPhone] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const clientId = crypto.randomUUID();
@@ -70,6 +71,7 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
         billing_city: separateBilling ? billingCity : city,
         billing_postal_code: separateBilling ? billingPostalCode : postalCode,
         billing_country: separateBilling ? billingCountry : country,
+        billing_phone: separateBilling ? billingPhone : phone,
       });
 
     setIsLoading(false);
@@ -112,6 +114,7 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
     setBillingCity("");
     setBillingPostalCode("");
     setBillingCountry("");
+    setBillingPhone("");
   };
 
   return (
@@ -170,10 +173,12 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
               billingCity={billingCity}
               billingPostalCode={billingPostalCode}
               billingCountry={billingCountry}
+              billingPhone={billingPhone}
               setBillingAddress={setBillingAddress}
               setBillingCity={setBillingCity}
               setBillingPostalCode={setBillingPostalCode}
               setBillingCountry={setBillingCountry}
+              setBillingPhone={setBillingPhone}
             />
           </div>
 

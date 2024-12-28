@@ -9,10 +9,12 @@ interface BillingAddressProps {
   billingCity: string;
   billingPostalCode: string;
   billingCountry: string;
+  billingPhone: string;
   setBillingAddress: (value: string) => void;
   setBillingCity: (value: string) => void;
   setBillingPostalCode: (value: string) => void;
   setBillingCountry: (value: string) => void;
+  setBillingPhone: (value: string) => void;
 }
 
 export function BillingAddress({
@@ -22,10 +24,12 @@ export function BillingAddress({
   billingCity,
   billingPostalCode,
   billingCountry,
+  billingPhone,
   setBillingAddress,
   setBillingCity,
   setBillingPostalCode,
   setBillingCountry,
+  setBillingPhone,
 }: BillingAddressProps) {
   return (
     <div className="space-y-4">
@@ -70,6 +74,15 @@ export function BillingAddress({
               id="billingCountry"
               value={billingCountry}
               onChange={(e) => setBillingCountry(e.target.value)}
+            />
+          </div>
+          <div className="col-span-2 space-y-2">
+            <Label htmlFor="billingPhone">Billing Phone</Label>
+            <Input
+              id="billingPhone"
+              type="tel"
+              value={billingPhone}
+              onChange={(e) => setBillingPhone(e.target.value)}
             />
           </div>
         </div>
