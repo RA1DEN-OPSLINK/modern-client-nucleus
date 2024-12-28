@@ -3,11 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData } from "./types";
-import { Database } from "@/integrations/supabase/types";
-
-interface UUIDResponse {
-  id: string;
-}
 
 export function useProfileForm(organizationId: string | undefined, onOpenChange: (open: boolean) => void) {
   const [isLoading, setIsLoading] = useState(false);
@@ -69,10 +64,11 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setIsLoading(true);
 
     try {
-      // Generate a UUID for the new profile
+      // Create the profile with a generated UUID
       const { data: uuidData, error: uuidError } = await supabase
         .from('profiles')
         .insert({
+          id: crypto.randomUUID(), // Generate a UUID for the profile
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone,
