@@ -39,7 +39,16 @@ export default function Teams() {
 
   const canManageTeams = profile?.role === "tenant" || profile?.role === "manager";
 
+  // Don't show the "Add Team Member" button if we don't have an organization
   if (isLoading) return <div>Loading...</div>;
+  if (!profile?.organization_id) {
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: "No organization found. Please contact support.",
+    });
+    return null;
+  }
 
   return (
     <div className="space-y-4">
@@ -54,18 +63,18 @@ export default function Teams() {
         </Button>
       </div>
 
-      <TeamsTable organizationId={profile?.organization_id} />
+      <TeamsTable organizationId={profile.organization_id} />
 
       <CreateTeamDialog
         open={isCreateTeamOpen}
         onOpenChange={setIsCreateTeamOpen}
-        organizationId={profile?.organization_id}
+        organizationId={profile.organization_id}
       />
 
       <CreateProfileDialog
         open={isCreateProfileOpen}
         onOpenChange={setIsCreateProfileOpen}
-        organizationId={profile?.organization_id}
+        organizationId={profile.organization_id}
       />
     </div>
   );
