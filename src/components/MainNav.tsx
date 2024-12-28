@@ -15,10 +15,10 @@ const SidebarToggle = () => {
   const isCollapsed = state === "collapsed";
 
   return (
-    <SidebarTrigger className="w-full flex justify-end px-2">
-      <div className="flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent">
+    <SidebarTrigger className="absolute -right-3 top-1/2 -translate-y-1/2 z-50">
+      <div className="flex items-center justify-center h-6 w-6 rounded-full bg-background border shadow-sm hover:bg-accent">
         <ChevronRight className={cn(
-          "h-4 w-4 transition-transform",
+          "h-3 w-3 transition-transform",
           isCollapsed ? "rotate-0" : "rotate-180"
         )} />
       </div>
@@ -28,16 +28,14 @@ const SidebarToggle = () => {
 
 export function MainNav() {
   return (
-    <>
+    <div className="relative h-full">
       <SidebarHeader className="flex h-16 items-center px-6">
         <span className="text-lg font-semibold tracking-tight">Navigation</span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu />
       </SidebarContent>
-      <SidebarFooter className="p-2">
-        <SidebarToggle />
-      </SidebarFooter>
-    </>
+      <SidebarToggle />
+    </div>
   );
 }
