@@ -43,12 +43,12 @@ export default function Calendar() {
   });
 
   // Fetch organization_id
-  const { data: organization } = useQuery({
+  const { data: orgData } = useQuery({
     queryKey: ['organization'],
     queryFn: async () => {
-      const { data: { organization_id }, error } = await supabase.rpc('get_user_org_id');
+      const { data, error } = await supabase.rpc('get_user_org_id');
       if (error) throw error;
-      return { organization_id };
+      return { organization_id: data };
     },
   });
 
@@ -70,7 +70,7 @@ export default function Calendar() {
     mutationFn: async (event: NewEvent) => {
       const { data, error } = await supabase
         .from('calendar_events')
-        .insert([{ ...event, organization_id: organization?.organization_id }])
+        .insert([event])
         .select()
         .single();
 
@@ -121,7 +121,7 @@ export default function Calendar() {
 
   const handleCreateEvent = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!organization?.organization_id) {
+    if (!orgData?.organization_id) {
       toast({
         title: "Error",
         description: "Organization ID not found",
@@ -129,7 +129,10 @@ export default function Calendar() {
       });
       return;
     }
-    createEvent.mutate(newEvent);
+    createEvent.mutate({
+      ...newEvent,
+      organization_id: orgData.organization_id
+    });
   };
 
   return (
