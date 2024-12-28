@@ -64,7 +64,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setIsLoading(true);
 
     try {
-      // First create the profile
+      // Create the profile
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .insert({

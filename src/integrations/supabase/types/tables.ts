@@ -86,6 +86,11 @@ export interface ProfilesTable {
     organization_id: string | null;
     role: 'tenant' | 'manager' | 'team' | 'client';
     updated_at: string;
+    postal_code: string | null;
+    phone: string | null;
+    city: string | null;
+    country: string | null;
+    address: string | null;
   };
   Insert: {
     avatar_url?: string | null;
@@ -96,6 +101,11 @@ export interface ProfilesTable {
     organization_id?: string | null;
     role?: 'tenant' | 'manager' | 'team' | 'client';
     updated_at?: string;
+    postal_code?: string | null;
+    phone?: string | null;
+    city?: string | null;
+    country?: string | null;
+    address?: string | null;
   };
   Update: {
     avatar_url?: string | null;
@@ -106,6 +116,11 @@ export interface ProfilesTable {
     organization_id?: string | null;
     role?: 'tenant' | 'manager' | 'team' | 'client';
     updated_at?: string;
+    postal_code?: string | null;
+    phone?: string | null;
+    city?: string | null;
+    country?: string | null;
+    address?: string | null;
   };
 }
 
