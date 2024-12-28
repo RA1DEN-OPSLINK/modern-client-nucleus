@@ -12,7 +12,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-full items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <CreateDialog />
+          {/* Left side empty now */}
         </div>
 
         <nav className="flex items-center gap-1 sm:gap-2">
@@ -47,6 +47,8 @@ export function Header() {
           </Button>
           
           <ThemeToggle />
+          
+          <CreateDialog />
           
           <div className="ml-2">
             <UserMenu />
