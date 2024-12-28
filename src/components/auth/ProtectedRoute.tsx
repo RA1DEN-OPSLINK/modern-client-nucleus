@@ -11,7 +11,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!isLoading && !session) {
       // Save the current location to redirect back after login
-      navigate('/auth', { state: { from: location.pathname } });
+      navigate('/auth', { 
+        state: { from: location.pathname },
+        replace: true // Use replace to prevent building up history
+      });
     }
   }, [session, isLoading, navigate, location]);
 

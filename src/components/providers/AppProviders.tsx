@@ -25,7 +25,10 @@ interface AppProvidersProps {
 export const AppProviders = ({ children }: AppProvidersProps) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionContextProvider supabaseClient={supabase}>
+      <SessionContextProvider 
+        supabaseClient={supabase}
+        initialSession={null}
+      >
         <BrowserRouter>
           <ThemeProvider defaultTheme="system" storageKey="app-theme">
             <TooltipProvider>
