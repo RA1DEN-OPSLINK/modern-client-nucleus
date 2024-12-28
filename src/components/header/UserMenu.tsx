@@ -20,7 +20,7 @@ export function UserMenu() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { data: profile } = useQuery({
+  const { data: profile, error: profileError } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
       if (!session?.user?.id) return null;
@@ -29,23 +29,49 @@ export function UserMenu() {
         .from("profiles")
         .select("*")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Profile fetch error:", error);
+        throw error;
+      }
+
+      if (!data) {
+        console.warn("No profile found for user:", session.user.id);
+        return null;
+      }
+
       return data;
     },
     enabled: !!session?.user?.id,
+    retry: false,
+    onError: (error) => {
+      console.error("Error fetching profile:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load your profile. Please try refreshing the page.",
+      });
+    },
   });
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Clear any local storage or state
+      localStorage.removeItem('app-auth');
+      
+      // Navigate to auth page
       navigate('/auth');
+      
       toast({
         title: "Signed out successfully",
         description: "You have been signed out of your account.",
       });
     } catch (error) {
+      console.error("Sign out error:", error);
       toast({
         variant: "destructive",
         title: "Error signing out",
@@ -61,6 +87,22 @@ export function UserMenu() {
 
   if (!session) return null;
 
+  // If we have a profile error or no profile, show a minimal version
+  if (profileError || !profile) {
+    return (
+      <Button 
+        variant="ghost" 
+        className="relative h-8 flex items-center space-x-2"
+        onClick={handleSignOut}
+      >
+        <Avatar className="h-8 w-8">
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
+        <span className="text-sm">Sign out</span>
+      </Button>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -70,11 +112,11 @@ export function UserMenu() {
         >
           <Avatar className="h-8 w-8">
             <AvatarImage 
-              src={profile?.avatar_url || undefined} 
-              alt={profile?.first_name || 'User'} 
+              src={profile.avatar_url || undefined} 
+              alt={profile.first_name || 'User'} 
             />
             <AvatarFallback>
-              {getInitials(profile?.first_name, profile?.last_name)}
+              {getInitials(profile.first_name, profile.last_name)}
             </AvatarFallback>
           </Avatar>
           <ChevronDown className="h-4 w-4" />
@@ -84,7 +126,7 @@ export function UserMenu() {
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {profile?.first_name} {profile?.last_name}
+              {profile.first_name} {profile.last_name}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {session.user.email}
