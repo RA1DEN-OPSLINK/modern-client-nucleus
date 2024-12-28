@@ -32,21 +32,23 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col gap-0 p-0">
+        <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle>Add New Team Member</DialogTitle>
           <DialogDescription>
             Create a new team member profile. They will receive an email to set up their account.
           </DialogDescription>
         </DialogHeader>
-        <ProfileForm
-          isLoading={isLoading}
-          onSubmit={handleSubmit}
-          onCancel={() => onOpenChange(false)}
-          formData={formData}
-          setFormData={updateFormData}
-          organizationId={organizationId}
-        />
+        <div className="flex-1 overflow-hidden">
+          <ProfileForm
+            isLoading={isLoading}
+            onSubmit={handleSubmit}
+            onCancel={() => onOpenChange(false)}
+            formData={formData}
+            setFormData={updateFormData}
+            organizationId={organizationId}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

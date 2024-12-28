@@ -24,30 +24,32 @@ export function ProfileForm({
   organizationId,
 }: ProfileFormProps) {
   return (
-    <form onSubmit={onSubmit} className="space-y-6 w-full max-w-3xl mx-auto max-h-[calc(100vh-200px)] overflow-y-auto">
-      <div className="space-y-8 px-6">
-        <AvatarSection formData={formData} setFormData={setFormData} />
-        
-        <div className="space-y-8">
-          <div className="bg-card rounded-lg border shadow-sm p-6">
-            <PersonalInfoSection formData={formData} setFormData={setFormData} />
-          </div>
+    <form onSubmit={onSubmit} className="h-full flex flex-col">
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-6 py-4 space-y-8">
+          <AvatarSection formData={formData} setFormData={setFormData} />
+          
+          <div className="grid gap-8">
+            <div className="bg-card rounded-lg border p-6">
+              <PersonalInfoSection formData={formData} setFormData={setFormData} />
+            </div>
 
-          <div className="bg-card rounded-lg border shadow-sm p-6">
-            <AddressSection formData={formData} setFormData={setFormData} />
-          </div>
+            <div className="bg-card rounded-lg border p-6">
+              <AddressSection formData={formData} setFormData={setFormData} />
+            </div>
 
-          <div className="bg-card rounded-lg border shadow-sm p-6">
-            <TeamSection 
-              formData={formData} 
-              setFormData={setFormData} 
-              organizationId={organizationId} 
-            />
+            <div className="bg-card rounded-lg border p-6">
+              <TeamSection 
+                formData={formData} 
+                setFormData={setFormData} 
+                organizationId={organizationId} 
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end gap-4 px-6 py-4 bg-muted/10 border-t sticky bottom-0">
+      <div className="flex items-center justify-end gap-4 px-6 py-4 border-t bg-muted/5">
         <Button
           type="button"
           variant="outline"
