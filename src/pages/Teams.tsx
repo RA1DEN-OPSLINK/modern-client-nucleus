@@ -12,7 +12,7 @@ export default function Teams() {
   const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
   const { session } = useSessionContext();
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
     enabled: !!session?.user.id,
     queryFn: async () => {
@@ -22,12 +22,21 @@ export default function Teams() {
         .eq("id", session?.user.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching profile",
+          description: error.message,
+        });
+        return null;
+      }
       return data;
     },
   });
 
   const canManageTeams = profile?.role === "tenant" || profile?.role === "manager";
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="space-y-4">
