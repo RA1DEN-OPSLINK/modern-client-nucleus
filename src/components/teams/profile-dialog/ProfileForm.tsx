@@ -29,7 +29,7 @@ export function ProfileForm({
   organizationId,
 }: ProfileFormProps) {
   return (
-    <form onSubmit={onSubmit} className="h-full flex flex-col">
+    <form onSubmit={onSubmit} className="flex flex-col h-[calc(100vh-200px)] max-h-[800px]">
       <ScrollArea className="flex-1">
         <div className="px-6 py-4 space-y-8">
           <AvatarSection formData={formData} setFormData={setFormData} />
