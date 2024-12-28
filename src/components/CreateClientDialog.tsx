@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ClientBasicInfo } from "./clients/ClientBasicInfo";
@@ -31,6 +33,11 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
   const [companyCountry, setCompanyCountry] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [separateBilling, setSeparateBilling] = useState(false);
+  const [billingAddress, setBillingAddress] = useState("");
+  const [billingCity, setBillingCity] = useState("");
+  const [billingPostalCode, setBillingPostalCode] = useState("");
+  const [billingCountry, setBillingCountry] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const clientId = crypto.randomUUID();
@@ -60,6 +67,10 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
         organization_id: organizationId,
         status: "lead",
         avatar_url: avatarUrl,
+        billing_address: separateBilling ? billingAddress : address,
+        billing_city: separateBilling ? billingCity : city,
+        billing_postal_code: separateBilling ? billingPostalCode : postalCode,
+        billing_country: separateBilling ? billingCountry : country,
       });
 
     setIsLoading(false);
@@ -97,6 +108,11 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
     setCompanyPostalCode("");
     setCompanyCountry("");
     setAvatarUrl(null);
+    setSeparateBilling(false);
+    setBillingAddress("");
+    setBillingCity("");
+    setBillingPostalCode("");
+    setBillingCountry("");
   };
 
   return (
@@ -147,6 +163,58 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
               setCompanyPostalCode={setCompanyPostalCode}
               setCompanyCountry={setCompanyCountry}
             />
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="billing-info"
+                  checked={separateBilling}
+                  onCheckedChange={setSeparateBilling}
+                />
+                <Label htmlFor="billing-info">Use different billing address</Label>
+              </div>
+
+              {separateBilling && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2 space-y-2">
+                    <Label htmlFor="billingAddress">Billing Address</Label>
+                    <input
+                      id="billingAddress"
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={billingAddress}
+                      onChange={(e) => setBillingAddress(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="billingCity">Billing City</Label>
+                    <input
+                      id="billingCity"
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={billingCity}
+                      onChange={(e) => setBillingCity(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="billingPostalCode">Billing Postal Code</Label>
+                    <input
+                      id="billingPostalCode"
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={billingPostalCode}
+                      onChange={(e) => setBillingPostalCode(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-span-2 space-y-2">
+                    <Label htmlFor="billingCountry">Billing Country</Label>
+                    <input
+                      id="billingCountry"
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={billingCountry}
+                      onChange={(e) => setBillingCountry(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex justify-end space-x-2">
