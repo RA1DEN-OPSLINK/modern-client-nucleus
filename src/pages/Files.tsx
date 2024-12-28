@@ -6,8 +6,10 @@ import { FileList } from "@/components/files/FileList";
 import { FolderBreadcrumb } from "@/components/files/FolderBreadcrumb";
 import { FileUpload } from "@/components/files/FileUpload";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Files() {
+  const { toast } = useToast();
   const {
     currentFolderId,
     setCurrentFolderId,
@@ -55,6 +57,22 @@ export default function Files() {
         description: error.message,
       });
     }
+  };
+
+  // Update folder path when navigating
+  const updateFolderPath = async (folder: any) => {
+    const newPath = [{ id: null, name: "Files" }];
+    let currentFolder = folder;
+
+    while (currentFolder) {
+      newPath.unshift({
+        id: currentFolder.id,
+        name: currentFolder.name,
+      });
+      currentFolder = currentFolder.parent;
+    }
+
+    setFolderPath(newPath);
   };
 
   // Handle folder navigation
