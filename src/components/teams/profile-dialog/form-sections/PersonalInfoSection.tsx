@@ -11,7 +11,9 @@ interface PersonalInfoSectionProps {
 export function PersonalInfoSection({ formData, setFormData }: PersonalInfoSectionProps) {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
+      <h3 className="text-lg font-medium">Personal Information</h3>
+      
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="firstName">First Name *</Label>
           <Input
@@ -32,7 +34,7 @@ export function PersonalInfoSection({ formData, setFormData }: PersonalInfoSecti
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="email">Email Address *</Label>
           <Input

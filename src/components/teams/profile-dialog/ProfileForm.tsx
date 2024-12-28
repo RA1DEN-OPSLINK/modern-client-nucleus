@@ -24,20 +24,28 @@ export function ProfileForm({
   organizationId,
 }: ProfileFormProps) {
   return (
-    <form onSubmit={onSubmit} className="space-y-8 w-[600px] max-h-[80vh] overflow-y-auto px-1">
-      <AvatarSection formData={formData} setFormData={setFormData} />
-      
+    <form onSubmit={onSubmit} className="space-y-8 w-[600px] max-h-[80vh] overflow-y-auto px-6 py-4">
       <div className="space-y-8">
-        <PersonalInfoSection formData={formData} setFormData={setFormData} />
-        <AddressSection formData={formData} setFormData={setFormData} />
-        <TeamSection 
-          formData={formData} 
-          setFormData={setFormData} 
-          organizationId={organizationId} 
-        />
+        <AvatarSection formData={formData} setFormData={setFormData} />
+        
+        <div className="space-y-8 border rounded-lg p-6 bg-muted/10">
+          <PersonalInfoSection formData={formData} setFormData={setFormData} />
+        </div>
+
+        <div className="space-y-8 border rounded-lg p-6 bg-muted/10">
+          <AddressSection formData={formData} setFormData={setFormData} />
+        </div>
+
+        <div className="space-y-8 border rounded-lg p-6 bg-muted/10">
+          <TeamSection 
+            formData={formData} 
+            setFormData={setFormData} 
+            organizationId={organizationId} 
+          />
+        </div>
       </div>
 
-      <div className="flex justify-end space-x-2 pt-4">
+      <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button
           type="button"
           variant="outline"

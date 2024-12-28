@@ -26,23 +26,27 @@ export function TeamSection({ formData, setFormData, organizationId }: TeamSecti
   });
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor="teams">Assign to Teams</Label>
-      <Select
-        value={formData.teamIds[0]}
-        onValueChange={(value) => setFormData({ teamIds: [value] })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select a team" />
-        </SelectTrigger>
-        <SelectContent>
-          {teams?.map((team) => (
-            <SelectItem key={team.id} value={team.id}>
-              {team.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Team Assignment</h3>
+      
+      <div className="space-y-2">
+        <Label htmlFor="teams">Assign to Teams</Label>
+        <Select
+          value={formData.teamIds[0]}
+          onValueChange={(value) => setFormData({ teamIds: [value] })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a team" />
+          </SelectTrigger>
+          <SelectContent>
+            {teams?.map((team) => (
+              <SelectItem key={team.id} value={team.id}>
+                {team.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }
