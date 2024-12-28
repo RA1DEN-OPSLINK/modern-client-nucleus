@@ -19,7 +19,6 @@ import Teams from "./pages/Teams";
 import Clients from "./pages/Clients";
 import Tenant from "./pages/Tenant";
 import Profile from "./pages/Profile";
-import Forms from "./pages/Forms";
 import Files from "./pages/Files";
 import Map from "./pages/Map";
 import Settings from "./pages/Settings";
@@ -101,16 +100,6 @@ const AppRoutes = () => (
         <ProtectedRoute>
           <AppLayout>
             <Profile />
-          </AppLayout>
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/forms"
-      element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Forms />
           </AppLayout>
         </ProtectedRoute>
       }

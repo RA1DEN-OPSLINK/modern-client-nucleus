@@ -7,7 +7,6 @@ import {
   Settings, 
   Calendar, 
   Building2,
-  FileText,
   Home
 } from "lucide-react";
 
@@ -65,12 +64,6 @@ export const menuSections: MenuSection[] = [
         title: "Calendar",
         path: "/calendar",
         icon: Calendar,
-        roles: ['tenant', 'manager', 'team']
-      },
-      {
-        title: "Forms",
-        path: "/forms",
-        icon: FileText,
         roles: ['tenant', 'manager', 'team']
       },
       {
