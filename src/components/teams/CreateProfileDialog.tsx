@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { AvatarUpload } from "@/components/profile/AvatarUpload";
 
 interface CreateProfileDialogProps {
   open: boolean;
@@ -21,9 +22,11 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const profileId = crypto.randomUUID(); // Generate profile ID upfront for avatar upload
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +48,7 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
     const { error } = await supabase
       .from("profiles")
       .insert({
-        id: crypto.randomUUID(), // Generate a new UUID for the profile
+        id: profileId,
         first_name: firstName,
         last_name: lastName,
         phone,
@@ -54,6 +57,7 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
         country,
         organization_id: organizationId,
         role: "team",
+        avatar_url: avatarUrl
       });
 
     setIsLoading(false);
@@ -80,6 +84,11 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
     setCity("");
     setPostalCode("");
     setCountry("");
+    setAvatarUrl(null);
+  };
+
+  const handleAvatarUploadComplete = (url: string) => {
+    setAvatarUrl(url);
   };
 
   return (
@@ -89,6 +98,18 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
           <DialogTitle>Add New Team Member</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
+            <AvatarUpload
+              profileId={profileId}
+              avatarUrl={avatarUrl}
+              firstName={firstName}
+              lastName={lastName}
+              setValue={(field, value) => {
+                if (field === 'avatar_url') setAvatarUrl(value);
+              }}
+              onUploadComplete={handleAvatarUploadComplete}
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="firstName">First Name</Label>
             <Input
