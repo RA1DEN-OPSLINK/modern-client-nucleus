@@ -39,15 +39,18 @@ export default function Teams() {
 
   const canManageTeams = profile?.role === "tenant" || profile?.role === "manager";
 
-  // Don't show the "Add Team Member" button if we don't have an organization
   if (isLoading) return <div>Loading...</div>;
+  
   if (!profile?.organization_id) {
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: "No organization found. Please contact support.",
-    });
-    return null;
+    return (
+      <div className="p-4">
+        <div className="rounded-md bg-destructive/15 p-3">
+          <div className="text-sm text-destructive">
+            No organization found. Please contact support.
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
