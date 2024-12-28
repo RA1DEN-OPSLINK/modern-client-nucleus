@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
@@ -19,14 +19,18 @@ const fadeIn = {
 const Auth = () => {
   const { session, isLoading } = useSessionContext();
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (!isLoading && session) {
-      navigate("/");
+      // Get the redirect path from location state or default to '/'
+      const from = location.state?.from || '/';
+      navigate(from, { replace: true });
     }
-  }, [session, isLoading, navigate]);
+  }, [session, isLoading, navigate, location]);
 
+  // Show loading spinner while checking session
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -40,6 +44,7 @@ const Auth = () => {
     );
   }
 
+  // If we have a session, don't render the auth page
   if (session) {
     return null;
   }
