@@ -11,14 +11,10 @@ export function UsersRolesTable() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
+      // Modified query to avoid ambiguous relationships
       const { data, error } = await supabase
         .from("profiles")
-        .select(`
-          *,
-          auth_user:id (
-            email
-          )
-        `)
+        .select("*, organization:organization_id(name)")
         .order("created_at", { ascending: false });
       
       if (error) throw error;
