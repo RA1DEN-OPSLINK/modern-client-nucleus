@@ -10,10 +10,12 @@ import { CreateDialog } from "./CreateDialog";
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-end">
-        <nav className="flex items-center space-x-4">
+      <div className="container flex h-14 max-w-full items-center justify-between px-4">
+        <div className="flex items-center gap-2">
           <CreateDialog />
-          
+        </div>
+
+        <nav className="flex items-center gap-1 sm:gap-2">
           <Button
             variant="ghost"
             size="icon"
@@ -24,7 +26,7 @@ export function Header() {
               <MessageSquare className="h-5 w-5" />
               <Badge 
                 variant="secondary" 
-                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
               >
                 3
               </Badge>
@@ -45,7 +47,10 @@ export function Header() {
           </Button>
           
           <ThemeToggle />
-          <UserMenu />
+          
+          <div className="ml-2">
+            <UserMenu />
+          </div>
         </nav>
       </div>
     </header>
