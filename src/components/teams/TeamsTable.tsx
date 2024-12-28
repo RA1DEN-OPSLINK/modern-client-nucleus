@@ -1,12 +1,10 @@
-import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Edit, Trash2, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ManageTeamMembersDialog } from "./ManageTeamMembersDialog";
 import { EditTeamDialog } from "./EditTeamDialog";
+import { TeamTableActions } from "./TeamTableActions";
 
 interface TeamsTableProps {
   organizationId?: string;
@@ -115,35 +113,17 @@ export function TeamsTable({ organizationId }: TeamsTableProps) {
               <TableCell>{team.team_members?.length || 0}</TableCell>
               <TableCell>{new Date(team.created_at).toLocaleDateString()}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setSelectedTeam(team);
-                      setIsManagingMembers(true);
-                    }}
-                  >
-                    <UserPlus className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setSelectedTeam(team);
-                      setIsEditingTeam(true);
-                    }}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteTeam(team.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                <TeamTableActions
+                  onManageMembers={() => {
+                    setSelectedTeam(team);
+                    setIsManagingMembers(true);
+                  }}
+                  onEdit={() => {
+                    setSelectedTeam(team);
+                    setIsEditingTeam(true);
+                  }}
+                  onDelete={() => handleDeleteTeam(team.id)}
+                />
               </TableCell>
             </TableRow>
           ))}

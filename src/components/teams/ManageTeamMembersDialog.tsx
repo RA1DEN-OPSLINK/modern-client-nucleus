@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Trash2, UserPlus } from "lucide-react";
+import { AddTeamMember } from "./AddTeamMember";
+import { TeamMemberList } from "./TeamMemberList";
 
 interface TeamMember {
   id: string;
@@ -58,7 +55,6 @@ export function ManageTeamMembersDialog({
 
   const handleAddMember = async () => {
     try {
-      // First, find the profile by email
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("id")
@@ -74,7 +70,6 @@ export function ManageTeamMembersDialog({
         return;
       }
 
-      // Add the team member
       const { error } = await supabase
         .from("team_members")
         .insert({
@@ -130,61 +125,17 @@ export function ManageTeamMembersDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Label htmlFor="email">Add Member by Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter email address"
-              />
-            </div>
-            <Button
-              className="self-end"
-              onClick={handleAddMember}
-              disabled={!email}
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              Add
-            </Button>
-          </div>
+          <AddTeamMember
+            email={email}
+            onEmailChange={setEmail}
+            onAddMember={handleAddMember}
+          />
 
-          <div className="space-y-2">
-            {isLoading ? (
-              <div>Loading...</div>
-            ) : (
-              teamMembers?.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-2 rounded-lg border"
-                >
-                  <div className="flex items-center gap-2">
-                    <Avatar>
-                      <AvatarImage src={member.profiles.avatar_url || undefined} />
-                      <AvatarFallback>
-                        {member.profiles.first_name?.[0]}
-                        {member.profiles.last_name?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">
-                        {member.profiles.first_name} {member.profiles.last_name}
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveMember(member.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))
-            )}
-          </div>
+          <TeamMemberList
+            teamMembers={teamMembers || []}
+            onRemoveMember={handleRemoveMember}
+            isLoading={isLoading}
+          />
         </div>
       </DialogContent>
     </Dialog>
