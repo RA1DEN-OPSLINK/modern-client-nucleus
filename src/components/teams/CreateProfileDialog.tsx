@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ProfileForm } from "./profile-dialog/ProfileForm";
 import { useProfileForm } from "./profile-dialog/useProfileForm";
 import { CreateProfileDialogProps } from "./profile-dialog/types";
@@ -28,7 +28,6 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
     updateFormData,
     handleSubmit,
     isLoading,
-    profileId
   } = useProfileForm(organizationId, onOpenChange);
 
   return (
@@ -36,6 +35,9 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Team Member</DialogTitle>
+          <DialogDescription>
+            Create a new team member profile. They will receive an email to set up their account.
+          </DialogDescription>
         </DialogHeader>
         <ProfileForm
           isLoading={isLoading}
@@ -43,7 +45,6 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
           onCancel={() => onOpenChange(false)}
           formData={formData}
           setFormData={updateFormData}
-          profileId={profileId}
         />
       </DialogContent>
     </Dialog>

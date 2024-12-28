@@ -8,7 +8,6 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const profileId = crypto.randomUUID();
 
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: "",
@@ -59,10 +58,21 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
+      // First create an auth user
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}@example.com`,
+        password: "temporary-password-123", // You should implement a secure password generation
+        email_confirm: true,
+      });
+
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("Failed to create user");
+
+      // Then create the profile
+      const { error: profileError } = await supabase
         .from("profiles")
         .insert({
-          id: profileId,
+          id: authData.user.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone,
@@ -74,7 +84,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
           avatar_url: formData.avatarUrl
         });
 
-      if (error) throw error;
+      if (profileError) throw profileError;
 
       toast({
         title: "Success",
@@ -85,12 +95,12 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
       onOpenChange(false);
       resetForm();
     } catch (error: any) {
+      console.error("Error creating profile:", error);
       toast({
         variant: "destructive",
         title: "Error creating profile",
         description: error.message,
       });
-      console.error("Error creating profile:", error);
     } finally {
       setIsLoading(false);
     }
@@ -101,6 +111,5 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     updateFormData,
     handleSubmit,
     isLoading,
-    profileId
   };
 }

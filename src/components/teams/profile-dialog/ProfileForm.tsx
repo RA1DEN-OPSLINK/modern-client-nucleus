@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { Loader2 } from "lucide-react";
 import { ProfileFormData } from "./types";
 
@@ -12,7 +10,6 @@ interface ProfileFormProps {
   onCancel: () => void;
   formData: ProfileFormData;
   setFormData: (data: Partial<ProfileFormData>) => void;
-  profileId: string;
 }
 
 export function ProfileForm({
@@ -21,28 +18,9 @@ export function ProfileForm({
   onCancel,
   formData,
   setFormData,
-  profileId,
 }: ProfileFormProps) {
-  const handleAvatarUploadComplete = (url: string) => {
-    setFormData({ avatarUrl: url });
-  };
-
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <div className="space-y-4">
-        <AvatarUpload
-          profileId={profileId}
-          avatarUrl={formData.avatarUrl}
-          firstName={formData.firstName}
-          lastName={formData.lastName}
-          setValue={(field, value) => {
-            if (field === 'avatar_url') {
-              setFormData({ avatarUrl: value });
-            }
-          }}
-          onUploadComplete={handleAvatarUploadComplete}
-        />
-      </div>
       <div className="space-y-2">
         <Label htmlFor="firstName">First Name *</Label>
         <Input
