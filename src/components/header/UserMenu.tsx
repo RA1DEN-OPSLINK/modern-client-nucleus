@@ -20,7 +20,7 @@ export function UserMenu() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { data: profile, error: profileError } = useQuery({
+  const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
       if (!session?.user?.id) return null;
@@ -45,14 +45,17 @@ export function UserMenu() {
     },
     enabled: !!session?.user?.id,
     retry: false,
-    onError: (error) => {
-      console.error("Error fetching profile:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to load your profile. Please try refreshing the page.",
-      });
-    },
+    meta: {
+      errorMessage: "Failed to load your profile. Please try refreshing the page.",
+      onError: (error: Error) => {
+        console.error("Error fetching profile:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load your profile. Please try refreshing the page.",
+        });
+      }
+    }
   });
 
   const handleSignOut = async () => {
@@ -87,8 +90,8 @@ export function UserMenu() {
 
   if (!session) return null;
 
-  // If we have a profile error or no profile, show a minimal version
-  if (profileError || !profile) {
+  // If we have no profile, show a minimal version
+  if (!profile) {
     return (
       <Button 
         variant="ghost" 
