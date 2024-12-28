@@ -1,9 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +7,8 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { format } from "date-fns";
+import { EventDialog } from "@/components/calendar/EventDialog";
+import { DailyAgenda } from "@/components/calendar/DailyAgenda";
 
 interface Event {
   id: string;
@@ -28,6 +25,7 @@ interface NewEvent {
   start_time: string;
   end_time: string;
   all_day: boolean;
+  organization_id: string;
 }
 
 export default function Calendar() {
@@ -41,6 +39,17 @@ export default function Calendar() {
     start_time: "",
     end_time: "",
     all_day: false,
+    organization_id: "", // Will be set when creating the event
+  });
+
+  // Fetch organization_id
+  const { data: organization } = useQuery({
+    queryKey: ['organization'],
+    queryFn: async () => {
+      const { data: { organization_id }, error } = await supabase.rpc('get_user_org_id');
+      if (error) throw error;
+      return { organization_id };
+    },
   });
 
   // Fetch events
@@ -61,7 +70,7 @@ export default function Calendar() {
     mutationFn: async (event: NewEvent) => {
       const { data, error } = await supabase
         .from('calendar_events')
-        .insert([event])
+        .insert([{ ...event, organization_id: organization?.organization_id }])
         .select()
         .single();
 
@@ -77,6 +86,7 @@ export default function Calendar() {
         start_time: "",
         end_time: "",
         all_day: false,
+        organization_id: "",
       });
       toast({
         title: "Success",
@@ -111,18 +121,15 @@ export default function Calendar() {
 
   const handleCreateEvent = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!organization?.organization_id) {
+      toast({
+        title: "Error",
+        description: "Organization ID not found",
+        variant: "destructive",
+      });
+      return;
+    }
     createEvent.mutate(newEvent);
-  };
-
-  // Filter events for the selected date
-  const getDailyAgenda = () => {
-    if (!selectedDate) return [];
-    const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
-    return events.filter((event: Event) => 
-      event.start_time.startsWith(selectedDateStr)
-    ).sort((a: Event, b: Event) => 
-      new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
-    );
   };
 
   return (
@@ -170,93 +177,16 @@ export default function Calendar() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {selectedDate 
-                ? `Agenda for ${format(selectedDate, 'MMMM d, yyyy')}`
-                : 'Daily Agenda'
-              }
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {selectedDate ? (
-                getDailyAgenda().length > 0 ? (
-                  getDailyAgenda().map((event: Event) => (
-                    <div key={event.id} className="p-4 border rounded-lg">
-                      <h3 className="font-medium">{event.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {format(new Date(event.start_time), 'h:mm a')} - 
-                        {format(new Date(event.end_time), 'h:mm a')}
-                      </p>
-                      {event.description && (
-                        <p className="mt-2 text-sm">{event.description}</p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground">No events scheduled for this day</p>
-                )
-              ) : (
-                <p className="text-muted-foreground">Select a date to view agenda</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <DailyAgenda selectedDate={selectedDate} events={events} />
       </div>
 
-      <Dialog open={isCreateEventOpen} onOpenChange={setIsCreateEventOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create New Event</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleCreateEvent} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">Title</label>
-              <Input
-                id="title"
-                value={newEvent.title}
-                onChange={(e) => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">Description</label>
-              <Textarea
-                id="description"
-                value={newEvent.description}
-                onChange={(e) => setNewEvent(prev => ({ ...prev, description: e.target.value }))}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="start_time" className="text-sm font-medium">Start Time</label>
-                <Input
-                  id="start_time"
-                  type="datetime-local"
-                  value={newEvent.start_time}
-                  onChange={(e) => setNewEvent(prev => ({ ...prev, start_time: e.target.value }))}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="end_time" className="text-sm font-medium">End Time</label>
-                <Input
-                  id="end_time"
-                  type="datetime-local"
-                  value={newEvent.end_time}
-                  onChange={(e) => setNewEvent(prev => ({ ...prev, end_time: e.target.value }))}
-                  required
-                />
-              </div>
-            </div>
-            <Button type="submit" className="w-full">
-              Create Event
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <EventDialog
+        isOpen={isCreateEventOpen}
+        onOpenChange={setIsCreateEventOpen}
+        newEvent={newEvent}
+        setNewEvent={setNewEvent}
+        onSubmit={handleCreateEvent}
+      />
     </div>
   );
 }
