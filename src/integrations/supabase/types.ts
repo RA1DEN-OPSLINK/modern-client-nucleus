@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      calendar_events: {
+        Row: {
+          all_day: boolean | null
+          created_at: string
+          description: string | null
+          end_time: string
+          id: string
+          organization_id: string
+          start_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          all_day?: boolean | null
+          created_at?: string
+          description?: string | null
+          end_time: string
+          id?: string
+          organization_id: string
+          start_time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          all_day?: boolean | null
+          created_at?: string
+          description?: string | null
+          end_time?: string
+          id?: string
+          organization_id?: string
+          start_time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           address: string | null
