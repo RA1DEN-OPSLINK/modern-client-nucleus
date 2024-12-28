@@ -23,6 +23,7 @@ import Forms from "./pages/Forms";
 import Files from "./pages/Files";
 import Map from "./pages/Map";
 import Settings from "./pages/Settings";
+import Calendar from "./pages/Calendar";
 
 // Initialize QueryClient with configuration
 const queryClient = new QueryClient({
@@ -120,6 +121,16 @@ const AppRoutes = () => (
         <ProtectedRoute>
           <AppLayout>
             <Files />
+          </AppLayout>
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/calendar"
+      element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Calendar />
           </AppLayout>
         </ProtectedRoute>
       }

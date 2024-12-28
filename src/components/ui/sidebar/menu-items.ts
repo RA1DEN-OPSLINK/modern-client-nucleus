@@ -1,5 +1,5 @@
 import { IconProps } from "@/types/icon-props";
-import { Users, MessageSquare, Folder, Map, Settings } from "lucide-react";
+import { Users, MessageSquare, Folder, Map, Settings, Calendar } from "lucide-react";
 
 export type MenuItem = {
   title: string;
@@ -25,6 +25,12 @@ export const menuItems: MenuItem[] = [
     title: "Files",
     path: "/files",
     icon: Folder,
+    roles: ['tenant', 'manager', 'team']
+  },
+  {
+    title: "Calendar",
+    path: "/calendar",
+    icon: Calendar,
     roles: ['tenant', 'manager', 'team']
   },
   {
