@@ -27,7 +27,7 @@ export function MainNav() {
   return (
     <>
       <SidebarHeader className="flex h-16 items-center justify-between border-b px-6">
-        <span className="text-lg font-semibold">Navigation</span>
+        <span className="text-lg font-semibold tracking-tight">Navigation</span>
         <SidebarToggle />
       </SidebarHeader>
       <SidebarContent>
