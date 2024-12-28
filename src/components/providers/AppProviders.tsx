@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createClient } from '@supabase/supabase-js';
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";

@@ -5,25 +5,28 @@ import { supabase } from "@/integrations/supabase/client";
 
 const App = () => {
   useEffect(() => {
-    // Check and refresh session on app load
-    const checkSession = async () => {
+    // Initialize session on app load
+    const initSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
-        console.error("Error checking session:", error);
+        console.error("Error initializing session:", error);
+      }
+      if (!session) {
+        console.log("No active session found");
       }
     };
 
-    checkSession();
+    initSession();
 
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event);
         if (event === 'SIGNED_OUT') {
-          // Handle sign out if needed
-          console.log('User signed out');
+          // Clear any session-related state or cached data
+          console.log('User signed out, clearing session');
         } else if (event === 'SIGNED_IN') {
-          // Handle sign in if needed
-          console.log('User signed in');
+          console.log('User signed in, session established');
         }
       }
     );
