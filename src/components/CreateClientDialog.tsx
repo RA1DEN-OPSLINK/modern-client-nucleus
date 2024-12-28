@@ -40,58 +40,78 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
   const [billingPhone, setBillingPhone] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const clientId = crypto.randomUUID();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!organizationId) return;
+    
+    if (!organizationId) {
+      toast({
+        variant: "destructive",
+        title: "Error creating client",
+        description: "Organization ID is required",
+      });
+      return;
+    }
+
+    if (!name) {
+      toast({
+        variant: "destructive",
+        title: "Error creating client",
+        description: "Client name is required",
+      });
+      return;
+    }
 
     setIsLoading(true);
-    const { error } = await supabase
-      .from("clients")
-      .insert({
-        id: clientId,
-        name,
-        email,
-        phone,
-        address,
-        city,
-        postal_code: postalCode,
-        country,
-        company_name: companyName,
-        company_phone: companyPhone,
-        company_address: companyAddress,
-        company_city: companyCity,
-        company_postal_code: companyPostalCode,
-        company_country: companyCountry,
-        organization_id: organizationId,
-        status: "lead",
-        avatar_url: avatarUrl,
-        billing_address: separateBilling ? billingAddress : address,
-        billing_city: separateBilling ? billingCity : city,
-        billing_postal_code: separateBilling ? billingPostalCode : postalCode,
-        billing_country: separateBilling ? billingCountry : country,
-        billing_phone: separateBilling ? billingPhone : phone,
+
+    try {
+      const { error } = await supabase
+        .from("clients")
+        .insert({
+          organization_id: organizationId,
+          name,
+          email,
+          phone,
+          address,
+          city,
+          postal_code: postalCode,
+          country,
+          company_name: companyName,
+          company_phone: companyPhone,
+          company_address: companyAddress,
+          company_city: companyCity,
+          company_postal_code: companyPostalCode,
+          company_country: companyCountry,
+          status: "lead",
+          avatar_url: avatarUrl,
+          billing_address: separateBilling ? billingAddress : address,
+          billing_city: separateBilling ? billingCity : city,
+          billing_postal_code: separateBilling ? billingPostalCode : postalCode,
+          billing_country: separateBilling ? billingCountry : country,
+          billing_phone: separateBilling ? billingPhone : phone,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Client created successfully",
       });
 
-    setIsLoading(false);
-
-    if (error) {
+      // Invalidate and refetch clients data
+      await queryClient.invalidateQueries({ queryKey: ["clients"] });
+      
+      // Reset form and close dialog
+      resetForm();
+      onOpenChange(false);
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error creating client",
         description: error.message,
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-
-    toast({
-      title: "Client created successfully",
-    });
-
-    queryClient.invalidateQueries({ queryKey: ["clients"] });
-    onOpenChange(false);
-    resetForm();
   };
 
   const resetForm = () => {
@@ -125,7 +145,7 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <ClientAvatar 
-            clientId={clientId}
+            clientId={crypto.randomUUID()}
             name={name}
             onUploadComplete={setAvatarUrl}
           />
