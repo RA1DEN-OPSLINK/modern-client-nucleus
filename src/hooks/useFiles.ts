@@ -16,7 +16,8 @@ export const useFiles = () => {
 
   // Get user's organization_id
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
-    queryKey: ["profile"],
+    queryKey: ["profile", session?.user?.id],
+    enabled: !!session?.user?.id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
@@ -24,15 +25,32 @@ export const useFiles = () => {
         .eq("id", session?.user.id)
         .maybeSingle();
 
-      if (error) throw error;
-      if (!data?.organization_id) throw new Error("No organization found");
+      if (error) {
+        console.error("Error fetching profile:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch profile data",
+        });
+        throw error;
+      }
+      
+      if (!data?.organization_id) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No organization found",
+        });
+        throw new Error("No organization found");
+      }
+      
       return data;
     },
   });
 
   // Fetch current folder details
   const { data: currentFolder } = useQuery({
-    queryKey: ["folder", currentFolderId],
+    queryKey: ["folder", currentFolderId, profile?.organization_id],
     enabled: !!currentFolderId && !!profile?.organization_id,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -41,7 +59,15 @@ export const useFiles = () => {
         .eq("id", currentFolderId)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching folder:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch folder details",
+        });
+        throw error;
+      }
       return data;
     },
   });
@@ -63,7 +89,16 @@ export const useFiles = () => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching folders:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch folders",
+        });
+        throw error;
+      }
       return data;
     },
   });
@@ -85,7 +120,16 @@ export const useFiles = () => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching files:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch files",
+        });
+        throw error;
+      }
       return data;
     },
   });
@@ -113,6 +157,7 @@ export const useFiles = () => {
       });
     },
     onError: (error: any) => {
+      console.error("Error creating folder:", error);
       toast({
         variant: "destructive",
         title: "Error creating folder",
@@ -144,6 +189,7 @@ export const useFiles = () => {
       });
     },
     onError: (error: any) => {
+      console.error("Error updating folder:", error);
       toast({
         variant: "destructive",
         title: "Error updating folder",
@@ -168,6 +214,7 @@ export const useFiles = () => {
       });
     },
     onError: (error: any) => {
+      console.error("Error deleting folder:", error);
       toast({
         variant: "destructive",
         title: "Error deleting folder",
@@ -192,6 +239,7 @@ export const useFiles = () => {
       });
     },
     onError: (error: any) => {
+      console.error("Error deleting file:", error);
       toast({
         variant: "destructive",
         title: "Error deleting file",

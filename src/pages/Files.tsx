@@ -7,9 +7,11 @@ import { FileActions } from "@/components/files/FileActions";
 import { UploadingFiles } from "@/components/files/UploadingFiles";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSessionContext } from "@supabase/auth-helpers-react";
 
 export default function Files() {
   const { toast } = useToast();
+  const { session, isLoading: isSessionLoading } = useSessionContext();
   const {
     currentFolderId,
     setCurrentFolderId,
@@ -54,6 +56,7 @@ export default function Files() {
       
       setTimeout(() => URL.revokeObjectURL(url), 100);
     } catch (error: any) {
+      console.error("Error downloading file:", error);
       toast({
         variant: "destructive",
         title: "Error downloading file",
@@ -64,41 +67,67 @@ export default function Files() {
 
   // Update folder path when navigating
   const updateFolderPath = async (folder: any) => {
-    const newPath = [{ id: null, name: "Files" }];
-    let currentFolder = folder;
+    try {
+      const newPath = [{ id: null, name: "Files" }];
+      let currentFolder = folder;
 
-    while (currentFolder) {
-      newPath.unshift({
-        id: currentFolder.id,
-        name: currentFolder.name,
+      while (currentFolder) {
+        newPath.unshift({
+          id: currentFolder.id,
+          name: currentFolder.name,
+        });
+        currentFolder = currentFolder.parent;
+      }
+
+      setFolderPath(newPath);
+    } catch (error: any) {
+      console.error("Error updating folder path:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update folder path",
       });
-      currentFolder = currentFolder.parent;
     }
-
-    setFolderPath(newPath);
   };
 
   // Handle folder navigation
   const handleFolderNavigation = async (folderId: string | null) => {
-    setCurrentFolderId(folderId);
-    if (!folderId) {
-      setFolderPath([{ id: null, name: "Files" }]);
-    } else {
-      const { data } = await supabase
-        .from("folders")
-        .select("*, parent:parent_id(*)")
-        .eq("id", folderId)
-        .maybeSingle();
-      
-      if (data) {
-        updateFolderPath(data);
+    try {
+      setCurrentFolderId(folderId);
+      if (!folderId) {
+        setFolderPath([{ id: null, name: "Files" }]);
+      } else {
+        const { data, error } = await supabase
+          .from("folders")
+          .select("*, parent:parent_id(*)")
+          .eq("id", folderId)
+          .maybeSingle();
+        
+        if (error) throw error;
+        
+        if (data) {
+          updateFolderPath(data);
+        }
       }
+    } catch (error: any) {
+      console.error("Error navigating to folder:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to navigate to folder",
+      });
     }
   };
 
+  const isLoading = isSessionLoading || isLoadingProfile || isLoadingFolders || isLoadingFiles;
+
   // Loading states
-  if (isLoadingProfile) {
-    return <div className="p-8 text-center">Loading profile...</div>;
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading...</div>;
+  }
+
+  if (!session) {
+    return <div className="p-8 text-center">Please sign in to access files.</div>;
   }
 
   if (!profile?.organization_id) {
@@ -132,7 +161,7 @@ export default function Files() {
         onFolderEdit={setEditingFolder}
         onFileDownload={handleFileDownload}
         onFileDelete={(id) => deleteFile.mutate(id)}
-        isLoading={isLoadingFolders || isLoadingFiles}
+        isLoading={isLoading}
       />
 
       <CreateFolderDialog
