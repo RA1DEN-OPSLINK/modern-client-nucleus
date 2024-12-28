@@ -42,6 +42,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (authError) throw authError;
 
+    console.log("User account created successfully:", authData);
+
+    if (!ZEPTO_API_KEY) {
+      throw new Error("ZEPTO_API_KEY is not set");
+    }
+
     // Send welcome email using Zepto Mail
     const res = await fetch("https://api.zeptomail.ca/v1.1/email", {
       method: "POST",
@@ -80,12 +86,15 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Failed to send email");
     }
 
+    const emailResponse = await res.json();
+    console.log("Email sent successfully:", emailResponse);
+
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error in send-welcome-email function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
