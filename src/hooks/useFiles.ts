@@ -63,20 +63,10 @@ export const useFiles = () => {
     isLoadingFiles,
     
     // Mutations
-    createFolder: (name: string) => {
-      if (!profile?.organization_id) return;
-      createFolder.mutate({ 
-        name, 
-        organizationId: profile.organization_id,
-        parentId: currentFolderId 
-      });
-    },
-    editFolder: (id: string, name: string) => {
-      if (!profile?.organization_id) return;
-      editFolder.mutate({ id, name, organizationId: profile.organization_id });
-    },
-    deleteFolder: deleteFolder.mutate,
-    deleteFile: deleteFile.mutate,
+    createFolder,
+    editFolder,
+    deleteFolder,
+    deleteFile,
     
     // Navigation handlers
     handleFolderNavigation,
