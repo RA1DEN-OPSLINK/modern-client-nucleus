@@ -10,7 +10,11 @@ import {
   Home,
   User,
   Globe,
-  UserCircle
+  UserCircle,
+  Plus,
+  FileText,
+  Briefcase,
+  CheckSquare
 } from "lucide-react";
 
 export type MenuSection = {
@@ -33,6 +37,29 @@ export const menuSections: MenuSection[] = [
         title: "Dashboard",
         path: "/",
         icon: Home,
+        roles: ['tenant', 'manager', 'team']
+      }
+    ]
+  },
+  {
+    label: "Create",
+    items: [
+      {
+        title: "Create Project",
+        path: "/create/project",
+        icon: FileText,
+        roles: ['tenant', 'manager', 'team']
+      },
+      {
+        title: "Create Job",
+        path: "/create/job",
+        icon: Briefcase,
+        roles: ['tenant', 'manager', 'team']
+      },
+      {
+        title: "Create Task",
+        path: "/create/task",
+        icon: CheckSquare,
         roles: ['tenant', 'manager', 'team']
       }
     ]
