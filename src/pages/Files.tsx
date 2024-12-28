@@ -1,10 +1,9 @@
 import { useFiles } from "@/hooks/useFiles";
-import { Button } from "@/components/ui/button";
-import { FolderPlus } from "lucide-react";
-import { CreateFolderDialog } from "@/components/files/CreateFolderDialog";
 import { FileList } from "@/components/files/FileList";
 import { FolderBreadcrumb } from "@/components/files/FolderBreadcrumb";
-import { FileUpload } from "@/components/files/FileUpload";
+import { CreateFolderDialog } from "@/components/files/CreateFolderDialog";
+import { FileActions } from "@/components/files/FileActions";
+import { UploadingFiles } from "@/components/files/UploadingFiles";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -112,21 +111,13 @@ export default function Files() {
             onNavigate={handleFolderNavigation}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            onClick={() => setIsCreateFolderOpen(true)}
-            disabled={!profile?.organization_id}
-          >
-            <FolderPlus className="mr-2 h-4 w-4" />
-            New Folder
-          </Button>
-          <FileUpload
-            currentFolderId={currentFolderId}
-            organizationId={profile.organization_id}
-            onUploadStart={setUploadingFiles}
-            onUploadComplete={() => setUploadingFiles([])}
-          />
-        </div>
+        <FileActions 
+          organizationId={profile.organization_id}
+          currentFolderId={currentFolderId}
+          onCreateFolder={() => setIsCreateFolderOpen(true)}
+          onUploadStart={setUploadingFiles}
+          onUploadComplete={() => setUploadingFiles([])}
+        />
       </div>
 
       <FileList
@@ -145,16 +136,7 @@ export default function Files() {
         onCreateFolder={(name) => createFolder.mutate(name)}
       />
 
-      {uploadingFiles.length > 0 && (
-        <div className="fixed bottom-4 right-4 bg-background border rounded-lg p-4 shadow-lg">
-          <h3 className="font-semibold mb-2">Uploading files...</h3>
-          {uploadingFiles.map((file) => (
-            <div key={file.name} className="text-sm">
-              {file.name}
-            </div>
-          ))}
-        </div>
-      )}
+      <UploadingFiles files={uploadingFiles} />
     </div>
   );
 }
