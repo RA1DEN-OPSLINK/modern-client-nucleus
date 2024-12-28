@@ -9,7 +9,8 @@ import {
   Building2,
   Home,
   User,
-  Globe
+  Globe,
+  UserCircle
 } from "lucide-react";
 
 export type MenuSection = {
@@ -52,21 +53,26 @@ export const menuSections: MenuSection[] = [
         roles: ['tenant', 'manager', 'team']
       },
       {
+        title: "Files",
+        path: "/files",
+        icon: Folder,
+        roles: ['tenant', 'manager', 'team']
+      }
+    ]
+  },
+  {
+    label: "Clients",
+    items: [
+      {
         title: "Clients",
         path: "/clients",
-        icon: Users,
+        icon: UserCircle,
         roles: ['tenant', 'manager', 'team']
       },
       {
         title: "Clients Portal",
         path: "/clients-portal",
         icon: Globe,
-        roles: ['tenant', 'manager', 'team']
-      },
-      {
-        title: "Files",
-        path: "/files",
-        icon: Folder,
         roles: ['tenant', 'manager', 'team']
       }
     ]
