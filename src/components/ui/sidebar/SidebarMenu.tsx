@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSessionContext } from '@supabase/auth-helpers-react';
 import { useQuery } from '@tanstack/react-query';
@@ -30,7 +29,7 @@ export const SidebarMenu = () => {
   const userRole = profile?.role || 'team';
 
   return (
-    <nav className="mt-4">
+    <nav className="mt-4 px-2">
       {menuItems
         .filter(item => item.roles.includes(userRole as any))
         .map(item => {
@@ -42,7 +41,7 @@ export const SidebarMenu = () => {
               key={item.path}
               to={item.path}
               className={cn(
-                "flex items-center px-4 py-3 text-sidebar-foreground",
+                "flex items-center px-4 py-3 text-sidebar-foreground rounded-md",
                 "transition-all duration-200 ease-in-out",
                 "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 "group relative overflow-hidden",
