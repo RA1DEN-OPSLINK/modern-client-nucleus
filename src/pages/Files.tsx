@@ -2,6 +2,7 @@ import { useFiles } from "@/hooks/useFiles";
 import { FileList } from "@/components/files/FileList";
 import { FolderBreadcrumb } from "@/components/files/FolderBreadcrumb";
 import { CreateFolderDialog } from "@/components/files/CreateFolderDialog";
+import { EditFolderDialog } from "@/components/files/EditFolderDialog";
 import { FileActions } from "@/components/files/FileActions";
 import { UploadingFiles } from "@/components/files/UploadingFiles";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,8 @@ export default function Files() {
     setFolderPath,
     isCreateFolderOpen,
     setIsCreateFolderOpen,
+    editingFolder,
+    setEditingFolder,
     uploadingFiles,
     setUploadingFiles,
     profile,
@@ -25,6 +28,7 @@ export default function Files() {
     isLoadingFolders,
     isLoadingFiles,
     createFolder,
+    editFolder,
     deleteFolder,
     deleteFile,
   } = useFiles();
@@ -125,6 +129,7 @@ export default function Files() {
         files={files || []}
         onFolderSelect={handleFolderNavigation}
         onFolderDelete={(id) => deleteFolder.mutate(id)}
+        onFolderEdit={setEditingFolder}
         onFileDownload={handleFileDownload}
         onFileDelete={(id) => deleteFile.mutate(id)}
         isLoading={isLoadingFolders || isLoadingFiles}
@@ -134,6 +139,13 @@ export default function Files() {
         open={isCreateFolderOpen}
         onOpenChange={setIsCreateFolderOpen}
         onCreateFolder={(name) => createFolder.mutate(name)}
+      />
+
+      <EditFolderDialog
+        open={!!editingFolder}
+        onOpenChange={(open) => !open && setEditingFolder(null)}
+        onEditFolder={(id, name) => editFolder.mutate({ id, name })}
+        folder={editingFolder}
       />
 
       <UploadingFiles files={uploadingFiles} />

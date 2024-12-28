@@ -12,6 +12,7 @@ export const useFiles = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { session } = useSessionContext();
+  const [editingFolder, setEditingFolder] = useState<{ id: string; name: string } | null>(null);
 
   // Get user's organization_id
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
@@ -120,6 +121,37 @@ export const useFiles = () => {
     },
   });
 
+  const editFolder = useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      if (!profile?.organization_id) {
+        throw new Error("No organization found");
+      }
+
+      const { data, error } = await supabase
+        .from("folders")
+        .update({ name })
+        .eq("id", id)
+        .eq("organization_id", profile.organization_id);
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      setEditingFolder(null);
+      toast({
+        title: "Folder updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error updating folder",
+        description: error.message,
+      });
+    },
+  });
+
   const deleteFolder = useMutation({
     mutationFn: async (folderId: string) => {
       const { error } = await supabase
@@ -185,7 +217,10 @@ export const useFiles = () => {
     isLoadingFolders,
     isLoadingFiles,
     createFolder,
+    editFolder,
     deleteFolder,
     deleteFile,
+    editingFolder,
+    setEditingFolder,
   };
 };

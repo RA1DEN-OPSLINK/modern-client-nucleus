@@ -6,6 +6,7 @@ interface FileListProps {
   files: any[];
   onFolderSelect: (folderId: string) => void;
   onFolderDelete: (folderId: string) => void;
+  onFolderEdit: (folder: { id: string; name: string }) => void;
   onFileDownload: (file: any) => void;
   onFileDelete: (fileId: string) => void;
   isLoading: boolean;
@@ -16,12 +17,19 @@ export function FileList({
   files,
   onFolderSelect,
   onFolderDelete,
+  onFolderEdit,
   onFileDownload,
   onFileDelete,
   isLoading,
 }: FileListProps) {
   if (isLoading) {
-    return <div className="text-center">Loading...</div>;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
+        ))}
+      </div>
+    );
   }
 
   if (!folders?.length && !files?.length) {
@@ -40,6 +48,7 @@ export function FileList({
           folder={folder}
           onSelect={onFolderSelect}
           onDelete={onFolderDelete}
+          onEdit={onFolderEdit}
         />
       ))}
 
