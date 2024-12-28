@@ -3,6 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { ProfileFormData } from "./types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileFormProps {
   isLoading: boolean;
@@ -10,6 +13,7 @@ interface ProfileFormProps {
   onCancel: () => void;
   formData: ProfileFormData;
   setFormData: (data: Partial<ProfileFormData>) => void;
+  organizationId: string;
 }
 
 export function ProfileForm({
@@ -18,7 +22,22 @@ export function ProfileForm({
   onCancel,
   formData,
   setFormData,
+  organizationId,
 }: ProfileFormProps) {
+  const { data: teams } = useQuery({
+    queryKey: ["teams", organizationId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("teams")
+        .select("id, name")
+        .eq("organization_id", organizationId);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!organizationId,
+  });
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
@@ -37,6 +56,14 @@ export function ProfileForm({
           value={formData.lastName}
           onChange={(e) => setFormData({ lastName: e.target.value })}
           required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="address">Address</Label>
+        <Input
+          id="address"
+          value={formData.address}
+          onChange={(e) => setFormData({ address: e.target.value })}
         />
       </div>
       <div className="space-y-2">
@@ -70,6 +97,39 @@ export function ProfileForm({
           value={formData.country}
           onChange={(e) => setFormData({ country: e.target.value })}
         />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="role">Role</Label>
+        <Select
+          value={formData.role}
+          onValueChange={(value: 'team' | 'manager') => setFormData({ role: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="team">Team Member</SelectItem>
+            <SelectItem value="manager">Manager</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="teams">Assign to Teams</Label>
+        <Select
+          value={formData.teamIds[0]} // For now, we'll support single team selection
+          onValueChange={(value) => setFormData({ teamIds: [value] })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a team" />
+          </SelectTrigger>
+          <SelectContent>
+            {teams?.map((team) => (
+              <SelectItem key={team.id} value={team.id}>
+                {team.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="flex justify-end space-x-2">
         <Button

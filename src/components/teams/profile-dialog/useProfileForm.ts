@@ -17,6 +17,9 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     postalCode: "",
     country: "",
     avatarUrl: null,
+    address: "",
+    teamIds: [],
+    role: "team",
   });
 
   const updateFormData = (newData: Partial<ProfileFormData>) => {
@@ -32,6 +35,9 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
       postalCode: "",
       country: "",
       avatarUrl: null,
+      address: "",
+      teamIds: [],
+      role: "team",
     });
   };
 
@@ -80,11 +86,26 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
           postal_code: formData.postalCode,
           country: formData.country,
           organization_id: organizationId,
-          role: "team",
-          avatar_url: formData.avatarUrl
+          role: formData.role,
+          avatar_url: formData.avatarUrl,
+          address: formData.address,
         });
 
       if (profileError) throw profileError;
+
+      // Add team member to selected teams
+      if (formData.teamIds.length > 0) {
+        const teamMembers = formData.teamIds.map(teamId => ({
+          team_id: teamId,
+          profile_id: authData.user.id,
+        }));
+
+        const { error: teamMemberError } = await supabase
+          .from("team_members")
+          .insert(teamMembers);
+
+        if (teamMemberError) throw teamMemberError;
+      }
 
       toast({
         title: "Success",
@@ -92,6 +113,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
       });
 
       queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["team-members"] });
       onOpenChange(false);
       resetForm();
     } catch (error: any) {

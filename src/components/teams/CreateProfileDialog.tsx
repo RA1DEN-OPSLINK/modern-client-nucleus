@@ -45,6 +45,7 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
           onCancel={() => onOpenChange(false)}
           formData={formData}
           setFormData={updateFormData}
+          organizationId={organizationId}
         />
       </DialogContent>
     </Dialog>
