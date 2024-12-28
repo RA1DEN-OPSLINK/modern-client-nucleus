@@ -26,7 +26,7 @@ const SidebarToggle = () => {
 export function MainNav() {
   return (
     <>
-      <SidebarHeader className="flex h-16 items-center border-b px-6">
+      <SidebarHeader className="flex h-16 items-center justify-between border-b px-6">
         <span className="text-lg font-semibold">Navigation</span>
         <SidebarToggle />
       </SidebarHeader>
