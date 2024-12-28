@@ -1,12 +1,12 @@
 import { StrictMode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createClient } from "@supabase/supabase-js";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 import { AppLayout } from "./layouts/AppLayout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -35,12 +35,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// Initialize Supabase client
-const supabase = createClient(
-  "https://qucizswoafsydzcmtxdh.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1Y2l6c3dvYWZzeWR6Y210eGRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ4NDA1NTksImV4cCI6MjA1MDQxNjU1OX0.bHYUA0NDkRY6jLb9h6mNXyMfwOyuuSPf566Q1Afwxcs"
-);
 
 const AppRoutes = () => (
   <Routes>
