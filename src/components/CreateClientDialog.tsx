@@ -2,14 +2,13 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ClientBasicInfo } from "./clients/ClientBasicInfo";
 import { ClientAddress } from "./clients/ClientAddress";
 import { CompanyInfo } from "./clients/CompanyInfo";
 import { ClientAvatar } from "./clients/ClientAvatar";
+import { BillingAddress } from "./clients/BillingAddress";
 
 interface CreateClientDialogProps {
   open: boolean;
@@ -164,57 +163,18 @@ export function CreateClientDialog({ open, onOpenChange, organizationId }: Creat
               setCompanyCountry={setCompanyCountry}
             />
 
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="billing-info"
-                  checked={separateBilling}
-                  onCheckedChange={setSeparateBilling}
-                />
-                <Label htmlFor="billing-info">Use different billing address</Label>
-              </div>
-
-              {separateBilling && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2 space-y-2">
-                    <Label htmlFor="billingAddress">Billing Address</Label>
-                    <input
-                      id="billingAddress"
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={billingAddress}
-                      onChange={(e) => setBillingAddress(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="billingCity">Billing City</Label>
-                    <input
-                      id="billingCity"
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={billingCity}
-                      onChange={(e) => setBillingCity(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="billingPostalCode">Billing Postal Code</Label>
-                    <input
-                      id="billingPostalCode"
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={billingPostalCode}
-                      onChange={(e) => setBillingPostalCode(e.target.value)}
-                    />
-                  </div>
-                  <div className="col-span-2 space-y-2">
-                    <Label htmlFor="billingCountry">Billing Country</Label>
-                    <input
-                      id="billingCountry"
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={billingCountry}
-                      onChange={(e) => setBillingCountry(e.target.value)}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            <BillingAddress
+              separateBilling={separateBilling}
+              setSeparateBilling={setSeparateBilling}
+              billingAddress={billingAddress}
+              billingCity={billingCity}
+              billingPostalCode={billingPostalCode}
+              billingCountry={billingCountry}
+              setBillingAddress={setBillingAddress}
+              setBillingCity={setBillingCity}
+              setBillingPostalCode={setBillingPostalCode}
+              setBillingCountry={setBillingCountry}
+            />
           </div>
 
           <div className="flex justify-end space-x-2">

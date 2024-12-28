@@ -56,6 +56,10 @@ export type Database = {
       clients: {
         Row: {
           address: string | null
+          billing_address: string | null
+          billing_city: string | null
+          billing_country: string | null
+          billing_postal_code: string | null
           city: string | null
           company_address: string | null
           company_city: string | null
@@ -76,6 +80,10 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          billing_address?: string | null
+          billing_city?: string | null
+          billing_country?: string | null
+          billing_postal_code?: string | null
           city?: string | null
           company_address?: string | null
           company_city?: string | null
@@ -96,6 +104,10 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          billing_address?: string | null
+          billing_city?: string | null
+          billing_country?: string | null
+          billing_postal_code?: string | null
           city?: string | null
           company_address?: string | null
           company_city?: string | null
