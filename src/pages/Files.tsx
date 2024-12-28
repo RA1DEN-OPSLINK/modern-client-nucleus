@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { FolderPlus, ArrowLeft, Upload } from "lucide-react";
+import { FolderPlus, Upload } from "lucide-react";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { CreateFolderDialog } from "@/components/files/CreateFolderDialog";
 import { FileList } from "@/components/files/FileList";
@@ -26,7 +26,7 @@ export default function Files() {
         .from("profiles")
         .select("organization_id")
         .eq("id", session?.user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       if (!data?.organization_id) throw new Error("No organization found");
@@ -43,7 +43,7 @@ export default function Files() {
         .from("folders")
         .select("*, parent:parent_id(*)")
         .eq("id", currentFolderId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -71,33 +71,45 @@ export default function Files() {
     setFolderPath(newPath);
   }, []);
 
-  // Fetch folders
+  // Fetch folders - Fixed the null parent_id query
   const { data: folders, isLoading: isLoadingFolders } = useQuery({
     queryKey: ["folders", currentFolderId, profile?.organization_id],
     enabled: !!profile?.organization_id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("folders")
         .select("*")
-        .eq("organization_id", profile.organization_id)
-        .eq("parent_id", currentFolderId);
+        .eq("organization_id", profile.organization_id);
+      
+      if (currentFolderId) {
+        query = query.eq("parent_id", currentFolderId);
+      } else {
+        query = query.is("parent_id", null);
+      }
 
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
   });
 
-  // Fetch files
+  // Fetch files - Fixed the null folder_id query
   const { data: files, isLoading: isLoadingFiles } = useQuery({
     queryKey: ["files", currentFolderId, profile?.organization_id],
     enabled: !!profile?.organization_id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("files")
         .select("*")
-        .eq("organization_id", profile.organization_id)
-        .eq("folder_id", currentFolderId);
+        .eq("organization_id", profile.organization_id);
+      
+      if (currentFolderId) {
+        query = query.eq("folder_id", currentFolderId);
+      } else {
+        query = query.is("folder_id", null);
+      }
 
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
@@ -280,7 +292,7 @@ export default function Files() {
         .from("folders")
         .select("*, parent:parent_id(*)")
         .eq("id", folderId)
-        .single();
+        .maybeSingle();
       
       if (data) {
         updateFolderPath(data);
