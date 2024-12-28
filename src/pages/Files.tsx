@@ -2,15 +2,15 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { Folder, File, Upload, FolderPlus, ArrowLeft, Trash2, Download } from "lucide-react";
+import { FolderPlus, ArrowLeft, Upload } from "lucide-react";
 import { useSessionContext } from "@supabase/auth-helpers-react";
+import { FileCard } from "@/components/files/FileCard";
+import { FolderCard } from "@/components/files/FolderCard";
+import { CreateFolderDialog } from "@/components/files/CreateFolderDialog";
 
 export default function Files() {
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
-  const [newFolderName, setNewFolderName] = useState("");
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState<File[]>([]);
   const { toast } = useToast();
@@ -66,9 +66,9 @@ export default function Files() {
 
   // Create folder mutation
   const createFolder = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (name: string) => {
       const { data, error } = await supabase.from("folders").insert({
-        name: newFolderName,
+        name,
         parent_id: currentFolderId,
         organization_id: profile?.organization_id,
       });
@@ -79,12 +79,11 @@ export default function Files() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["folders"] });
       setIsCreateFolderOpen(false);
-      setNewFolderName("");
       toast({
         title: "Folder created successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         variant: "destructive",
         title: "Error creating folder",
@@ -109,7 +108,7 @@ export default function Files() {
         title: "Folder deleted successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         variant: "destructive",
         title: "Error deleting folder",
@@ -134,7 +133,7 @@ export default function Files() {
         title: "File deleted successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         variant: "destructive",
         title: "Error deleting file",
@@ -146,7 +145,7 @@ export default function Files() {
   // Handle file upload
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files) return;
+    if (!files || !profile?.organization_id) return;
 
     setUploadingFiles(Array.from(files));
 
@@ -155,7 +154,7 @@ export default function Files() {
         // Upload file to storage
         const { data: storageData, error: storageError } = await supabase.storage
           .from("files")
-          .upload(`${profile?.organization_id}/${file.name}`, file);
+          .upload(`${profile.organization_id}/${file.name}`, file);
 
         if (storageError) throw storageError;
 
@@ -163,7 +162,7 @@ export default function Files() {
         const { error: dbError } = await supabase.from("files").insert({
           name: file.name,
           folder_id: currentFolderId,
-          organization_id: profile?.organization_id,
+          organization_id: profile.organization_id,
           storage_path: storageData.path,
           size: file.size,
           mime_type: file.type,
@@ -196,7 +195,6 @@ export default function Files() {
 
       if (error) throw error;
 
-      // Create download link
       const url = URL.createObjectURL(data);
       const link = document.createElement("a");
       link.href = url;
@@ -230,32 +228,10 @@ export default function Files() {
           <h1 className="text-3xl font-bold tracking-tight">Files</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <FolderPlus className="mr-2 h-4 w-4" />
-                New Folder
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Folder</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <Input
-                  placeholder="Folder name"
-                  value={newFolderName}
-                  onChange={(e) => setNewFolderName(e.target.value)}
-                />
-                <Button
-                  onClick={() => createFolder.mutate()}
-                  disabled={!newFolderName}
-                >
-                  Create
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => setIsCreateFolderOpen(true)}>
+            <FolderPlus className="mr-2 h-4 w-4" />
+            New Folder
+          </Button>
           <div className="relative">
             <input
               type="file"
@@ -273,62 +249,29 @@ export default function Files() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {folders?.map((folder) => (
-          <div
+          <FolderCard
             key={folder.id}
-            className="p-4 border rounded-lg hover:bg-accent cursor-pointer relative group"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteFolder.mutate(folder.id);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-            <div
-              className="flex items-center gap-2"
-              onClick={() => setCurrentFolderId(folder.id)}
-            >
-              <Folder className="h-6 w-6" />
-              <span>{folder.name}</span>
-            </div>
-          </div>
+            folder={folder}
+            onSelect={setCurrentFolderId}
+            onDelete={(id) => deleteFolder.mutate(id)}
+          />
         ))}
 
         {files?.map((file) => (
-          <div
+          <FileCard
             key={file.id}
-            className="p-4 border rounded-lg relative group"
-          >
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 flex gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleFileDownload(file)}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => deleteFile.mutate(file.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex items-center gap-2">
-              <File className="h-6 w-6" />
-              <span>{file.name}</span>
-            </div>
-            <div className="text-sm text-muted-foreground mt-1">
-              {(file.size / 1024 / 1024).toFixed(2)} MB
-            </div>
-          </div>
+            file={file}
+            onDownload={handleFileDownload}
+            onDelete={(id) => deleteFile.mutate(id)}
+          />
         ))}
       </div>
+
+      <CreateFolderDialog
+        open={isCreateFolderOpen}
+        onOpenChange={setIsCreateFolderOpen}
+        onCreateFolder={(name) => createFolder.mutate(name)}
+      />
 
       {uploadingFiles.length > 0 && (
         <div className="fixed bottom-4 right-4 bg-background border rounded-lg p-4 shadow-lg">

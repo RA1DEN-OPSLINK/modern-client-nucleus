@@ -403,7 +403,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_org_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      is_manager_or_tenant: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_tenant: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       user_role: "tenant" | "manager" | "team" | "client"
