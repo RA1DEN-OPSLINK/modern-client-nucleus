@@ -4,6 +4,10 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData } from "./types";
 
+interface UUIDResponse {
+  id: string;
+}
+
 export function useProfileForm(organizationId: string | undefined, onOpenChange: (open: boolean) => void) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -65,15 +69,16 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
 
     try {
       // Generate a UUID for the new profile
-      const { data: { id: newProfileId }, error: uuidError } = await supabase.rpc('generate_uuid');
+      const { data, error: uuidError } = await supabase.rpc<UUIDResponse>('generate_uuid');
       
       if (uuidError) throw uuidError;
+      if (!data) throw new Error('Failed to generate UUID');
 
       // Create the profile
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .insert({
-          id: newProfileId,
+          id: data.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone,
