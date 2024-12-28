@@ -5,9 +5,11 @@ import {
   Folder, 
   Map, 
   Settings, 
-  Calendar, 
+  Calendar,
   Building2,
-  Home
+  Home,
+  User,
+  Globe
 } from "lucide-react";
 
 export type MenuSection = {
@@ -44,9 +46,21 @@ export const menuSections: MenuSection[] = [
         roles: ['tenant', 'manager', 'team']
       },
       {
-        title: "Chat",
-        path: "/chat",
-        icon: MessageSquare,
+        title: "My Profile",
+        path: "/profile",
+        icon: User,
+        roles: ['tenant', 'manager', 'team']
+      },
+      {
+        title: "Clients",
+        path: "/clients",
+        icon: Users,
+        roles: ['tenant', 'manager', 'team']
+      },
+      {
+        title: "Clients Portal",
+        path: "/clients-portal",
+        icon: Globe,
         roles: ['tenant', 'manager', 'team']
       },
       {

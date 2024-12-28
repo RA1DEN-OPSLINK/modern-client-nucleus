@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import Index from "./pages/Index";
 import Teams from "./pages/Teams";
 import Clients from "./pages/Clients";
+import ClientsPortal from "./pages/ClientsPortal";
 import Tenant from "./pages/Tenant";
 import Profile from "./pages/Profile";
 import Files from "./pages/Files";
@@ -80,6 +81,16 @@ const AppRoutes = () => (
         <ProtectedRoute>
           <AppLayout>
             <Clients />
+          </AppLayout>
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/clients-portal"
+      element={
+        <ProtectedRoute>
+          <AppLayout>
+            <ClientsPortal />
           </AppLayout>
         </ProtectedRoute>
       }
