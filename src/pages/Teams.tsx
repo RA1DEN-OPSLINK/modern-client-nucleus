@@ -27,40 +27,7 @@ export default function Teams() {
     },
   });
 
-  const { data: teams, isLoading } = useQuery({
-    queryKey: ["teams", profile?.organization_id],
-    enabled: !!profile?.organization_id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("teams")
-        .select(`
-          *,
-          team_members (
-            profiles (
-              id,
-              first_name,
-              last_name,
-              role
-            )
-          )
-        `)
-        .eq("organization_id", profile.organization_id);
-
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error fetching teams",
-          description: error.message,
-        });
-        return [];
-      }
-
-      return data;
-    },
-  });
-
   const canManageTeams = profile?.role === "tenant" || profile?.role === "manager";
-  const canDeleteTeams = profile?.role === "tenant";
 
   return (
     <div className="space-y-4">
@@ -69,12 +36,7 @@ export default function Teams() {
         onCreateTeam={() => setIsCreateTeamOpen(true)}
       />
 
-      <TeamsTable
-        teams={teams}
-        isLoading={isLoading}
-        canManageTeams={canManageTeams}
-        canDeleteTeams={canDeleteTeams}
-      />
+      <TeamsTable organizationId={profile?.organization_id} />
 
       <CreateTeamDialog
         open={isCreateTeamOpen}

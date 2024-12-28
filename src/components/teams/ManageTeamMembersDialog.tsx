@@ -8,9 +8,15 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trash2, UserPlus } from "lucide-react";
+import { ProfilesTable } from "@/integrations/supabase/types/tables";
+
+interface TeamMember {
+  id: string;
+  profiles: ProfilesTable['Row'];
+}
 
 interface ManageTeamMembersDialogProps {
-  teamId: string;
+  teamId?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -36,14 +42,13 @@ export function ManageTeamMembersDialog({
             id,
             first_name,
             last_name,
-            email,
             avatar_url
           )
         `)
         .eq("team_id", teamId);
 
       if (error) throw error;
-      return data;
+      return data as TeamMember[];
     },
   });
 
@@ -162,9 +167,6 @@ export function ManageTeamMembersDialog({
                     <div>
                       <p className="font-medium">
                         {member.profiles.first_name} {member.profiles.last_name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.profiles.email}
                       </p>
                     </div>
                   </div>
