@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
+import { Loader2 } from "lucide-react";
 
 interface CreateProfileDialogProps {
   open: boolean;
@@ -26,65 +27,75 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const profileId = crypto.randomUUID(); // Generate profile ID upfront for avatar upload
+  const profileId = crypto.randomUUID();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!organizationId) return;
-
-    setIsLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
+    if (!organizationId) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "No authenticated user found",
+        description: "Organization ID is required",
       });
-      setIsLoading(false);
       return;
     }
 
-    const { error } = await supabase
-      .from("profiles")
-      .insert({
-        id: profileId,
-        first_name: firstName,
-        last_name: lastName,
-        phone,
-        city,
-        postal_code: postalCode,
-        country,
-        organization_id: organizationId,
-        role: "team",
-        avatar_url: avatarUrl
+    if (!firstName || !lastName) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "First name and last name are required",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .insert({
+          id: profileId,
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+          city,
+          postal_code: postalCode,
+          country,
+          organization_id: organizationId,
+          role: "team",
+          avatar_url: avatarUrl
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Team member profile created successfully",
       });
 
-    setIsLoading(false);
-
-    if (error) {
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      onOpenChange(false);
+      
+      // Reset form
+      setFirstName("");
+      setLastName("");
+      setPhone("");
+      setAddress("");
+      setCity("");
+      setPostalCode("");
+      setCountry("");
+      setAvatarUrl(null);
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error creating profile",
         description: error.message,
       });
-      return;
+      console.error("Error creating profile:", error);
+    } finally {
+      setIsLoading(false);
     }
-
-    toast({
-      title: "Profile created successfully",
-    });
-
-    queryClient.invalidateQueries({ queryKey: ["profiles"] });
-    onOpenChange(false);
-    setFirstName("");
-    setLastName("");
-    setPhone("");
-    setAddress("");
-    setCity("");
-    setPostalCode("");
-    setCountry("");
-    setAvatarUrl(null);
   };
 
   const handleAvatarUploadComplete = (url: string) => {
@@ -111,7 +122,7 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="firstName">First Name</Label>
+            <Label htmlFor="firstName">First Name *</Label>
             <Input
               id="firstName"
               value={firstName}
@@ -120,7 +131,7 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName">Last Name</Label>
+            <Label htmlFor="lastName">Last Name *</Label>
             <Input
               id="lastName"
               value={lastName}
@@ -174,11 +185,19 @@ export function CreateProfileDialog({ open, onOpenChange, organizationId }: Crea
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isLoading}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              Add Team Member
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Add Team Member'
+              )}
             </Button>
           </div>
         </form>
