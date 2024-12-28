@@ -64,10 +64,16 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setIsLoading(true);
 
     try {
+      // Generate a UUID for the new profile
+      const { data: { id: newProfileId }, error: uuidError } = await supabase.rpc('generate_uuid');
+      
+      if (uuidError) throw uuidError;
+
       // Create the profile
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .insert({
+          id: newProfileId,
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone,
