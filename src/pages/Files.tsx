@@ -14,9 +14,7 @@ export default function Files() {
   const { session, isLoading: isSessionLoading } = useSessionContext();
   const {
     currentFolderId,
-    setCurrentFolderId,
     folderPath,
-    setFolderPath,
     isCreateFolderOpen,
     setIsCreateFolderOpen,
     editingFolder,
@@ -33,6 +31,7 @@ export default function Files() {
     editFolder,
     deleteFolder,
     deleteFile,
+    handleFolderNavigation,
   } = useFiles();
 
   // Handle file download
@@ -61,60 +60,6 @@ export default function Files() {
         variant: "destructive",
         title: "Error downloading file",
         description: error.message,
-      });
-    }
-  };
-
-  // Update folder path when navigating
-  const updateFolderPath = async (folder: any) => {
-    try {
-      const newPath = [{ id: null, name: "Files" }];
-      let currentFolder = folder;
-
-      while (currentFolder) {
-        newPath.unshift({
-          id: currentFolder.id,
-          name: currentFolder.name,
-        });
-        currentFolder = currentFolder.parent;
-      }
-
-      setFolderPath(newPath);
-    } catch (error: any) {
-      console.error("Error updating folder path:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update folder path",
-      });
-    }
-  };
-
-  // Handle folder navigation
-  const handleFolderNavigation = async (folderId: string | null) => {
-    try {
-      setCurrentFolderId(folderId);
-      if (!folderId) {
-        setFolderPath([{ id: null, name: "Files" }]);
-      } else {
-        const { data, error } = await supabase
-          .from("folders")
-          .select("*, parent:parent_id(*)")
-          .eq("id", folderId)
-          .maybeSingle();
-        
-        if (error) throw error;
-        
-        if (data) {
-          updateFolderPath(data);
-        }
-      }
-    } catch (error: any) {
-      console.error("Error navigating to folder:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to navigate to folder",
       });
     }
   };
@@ -167,13 +112,21 @@ export default function Files() {
       <CreateFolderDialog
         open={isCreateFolderOpen}
         onOpenChange={setIsCreateFolderOpen}
-        onCreateFolder={(name) => createFolder.mutate(name)}
+        onCreateFolder={(name) => createFolder.mutate({ 
+          name, 
+          organizationId: profile.organization_id,
+          parentId: currentFolderId 
+        })}
       />
 
       <EditFolderDialog
         open={!!editingFolder}
         onOpenChange={(open) => !open && setEditingFolder(null)}
-        onEditFolder={(id, name) => editFolder.mutate({ id, name })}
+        onEditFolder={(id, name) => editFolder.mutate({ 
+          id, 
+          name, 
+          organizationId: profile.organization_id 
+        })}
         folder={editingFolder}
       />
 

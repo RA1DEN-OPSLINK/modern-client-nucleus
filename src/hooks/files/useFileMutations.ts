@@ -12,7 +12,7 @@ export const useFileMutations = () => {
         name,
         parent_id: parentId,
         organization_id: organizationId,
-      });
+      }).select().single();
 
       if (error) throw error;
       return data;
@@ -39,7 +39,9 @@ export const useFileMutations = () => {
         .from("folders")
         .update({ name })
         .eq("id", id)
-        .eq("organization_id", organizationId);
+        .eq("organization_id", organizationId)
+        .select()
+        .single();
 
       if (error) throw error;
       return data;

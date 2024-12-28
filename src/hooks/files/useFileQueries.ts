@@ -28,15 +28,6 @@ export const useFileQueries = (currentFolderId: string | null) => {
         throw error;
       }
       
-      if (!data?.organization_id) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "No organization found",
-        });
-        throw new Error("No organization found");
-      }
-      
       return data;
     },
   });
