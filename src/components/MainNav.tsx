@@ -7,7 +7,7 @@ import {
   SidebarTrigger,
   useSidebar 
 } from "@/components/ui/sidebar";
-import { ChevronRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SidebarToggle = () => {
@@ -17,9 +17,9 @@ const SidebarToggle = () => {
   return (
     <SidebarTrigger className="absolute -right-3 top-1/2 -translate-y-1/2 z-50">
       <div className="flex items-center justify-center h-6 w-6 rounded-full bg-background border shadow-sm hover:bg-accent">
-        <ChevronRight className={cn(
-          "h-3 w-3 transition-transform",
-          isCollapsed ? "rotate-0" : "rotate-180"
+        <ArrowLeft className={cn(
+          "h-3 w-3 transition-transform duration-200",
+          isCollapsed ? "-rotate-180" : "rotate-0"
         )} />
       </div>
     </SidebarTrigger>
