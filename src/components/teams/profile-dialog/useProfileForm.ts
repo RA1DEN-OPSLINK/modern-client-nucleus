@@ -20,6 +20,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     address: "",
     teamIds: [],
     role: "team",
+    email: "", // Add email field
   });
 
   const updateFormData = (newData: Partial<ProfileFormData>) => {
@@ -38,6 +39,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
       address: "",
       teamIds: [],
       role: "team",
+      email: "",
     });
   };
 
@@ -52,11 +54,11 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
       return;
     }
 
-    if (!formData.firstName || !formData.lastName) {
+    if (!formData.firstName || !formData.lastName || !formData.email) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "First name and last name are required",
+        description: "First name, last name, and email are required",
       });
       return;
     }
@@ -64,6 +66,21 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     setIsLoading(true);
 
     try {
+      // Generate a temporary password
+      const temporaryPassword = Math.random().toString(36).slice(-8);
+
+      // Send welcome email with temporary password
+      const { error: emailError } = await supabase.functions.invoke('send-welcome-email', {
+        body: {
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          temporaryPassword,
+        },
+      });
+
+      if (emailError) throw emailError;
+
       // Create the profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -102,7 +119,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
 
       toast({
         title: "Success",
-        description: "Team member profile created successfully",
+        description: "Team member profile created successfully. An email has been sent with login instructions.",
       });
 
       queryClient.invalidateQueries({ queryKey: ["profiles"] });
