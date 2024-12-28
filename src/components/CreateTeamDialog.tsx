@@ -17,43 +17,63 @@ interface CreateTeamDialogProps {
 export function CreateTeamDialog({ open, onOpenChange, organizationId }: CreateTeamDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!organizationId) return;
+    if (!organizationId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Organization ID is required",
+      });
+      return;
+    }
 
-    setIsLoading(true);
-    const { error } = await supabase
-      .from("teams")
-      .insert({
-        name,
-        description,
-        organization_id: organizationId,
+    if (!name.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Team name is required",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("teams")
+        .insert({
+          name: name.trim(),
+          description: description.trim(),
+          organization_id: organizationId,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Team created successfully",
       });
 
-    setIsLoading(false);
-
-    if (error) {
+      // Reset form and close dialog
+      setName("");
+      setDescription("");
+      onOpenChange(false);
+      
+      // Refresh teams data
+      queryClient.invalidateQueries({ queryKey: ["teams"] });
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error creating team",
         description: error.message,
       });
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    toast({
-      title: "Team created successfully",
-    });
-
-    queryClient.invalidateQueries({ queryKey: ["teams"] });
-    queryClient.invalidateQueries({ queryKey: ["tenant-stats"] });
-    onOpenChange(false);
-    setName("");
-    setDescription("");
   };
 
   return (
@@ -72,6 +92,7 @@ export function CreateTeamDialog({ open, onOpenChange, organizationId }: CreateT
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              placeholder="Enter team name"
               required
             />
           </div>
@@ -81,6 +102,7 @@ export function CreateTeamDialog({ open, onOpenChange, organizationId }: CreateT
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter team description (optional)"
             />
           </div>
           <div className="flex justify-end space-x-2">
@@ -88,11 +110,15 @@ export function CreateTeamDialog({ open, onOpenChange, organizationId }: CreateT
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              Create Team
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating..." : "Create Team"}
             </Button>
           </div>
         </form>
