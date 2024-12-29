@@ -8,7 +8,7 @@ export interface ProfileFormData {
   avatarUrl: string | null;
   address: string;
   teamIds: string[];
-  role: 'team' | 'manager';
+  role: 'team' | 'manager';  // Restricted to only team or manager
   email: string;
 }
 

@@ -19,11 +19,15 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
     avatarUrl: null,
     address: "",
     teamIds: [],
-    role: "team",
-    email: "", // Add email field
+    role: "team", // Default to team role
+    email: "",
   });
 
   const updateFormData = (newData: Partial<ProfileFormData>) => {
+    // Ensure role can only be 'team' or 'manager'
+    if (newData.role && newData.role !== 'team' && newData.role !== 'manager') {
+      newData.role = 'team';
+    }
     setFormData(prev => ({ ...prev, ...newData }));
   };
 
@@ -63,6 +67,16 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
       return;
     }
 
+    // Validate role is either team or manager
+    if (formData.role !== 'team' && formData.role !== 'manager') {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Invalid role selected",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -81,7 +95,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
 
       if (emailError) throw emailError;
 
-      // Create the profile
+      // Create the profile with the selected role (team or manager only)
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .insert({
@@ -93,7 +107,7 @@ export function useProfileForm(organizationId: string | undefined, onOpenChange:
           postal_code: formData.postalCode,
           country: formData.country,
           organization_id: organizationId,
-          role: formData.role,
+          role: formData.role, // This will only be 'team' or 'manager'
           avatar_url: formData.avatarUrl,
           address: formData.address,
         })
