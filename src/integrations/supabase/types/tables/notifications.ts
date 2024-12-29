@@ -5,7 +5,7 @@ export interface NotificationTables {
       user_id: string;
       title: string;
       message: string;
-      read: boolean | null;
+      read: boolean;
       created_at: string;
       updated_at: string;
     };
@@ -14,7 +14,7 @@ export interface NotificationTables {
       user_id: string;
       title: string;
       message: string;
-      read?: boolean | null;
+      read?: boolean;
       created_at?: string;
       updated_at?: string;
     };
@@ -23,18 +23,9 @@ export interface NotificationTables {
       user_id?: string;
       title?: string;
       message?: string;
-      read?: boolean | null;
+      read?: boolean;
       created_at?: string;
       updated_at?: string;
     };
-    Relationships: [
-      {
-        foreignKeyName: "notifications_user_id_fkey";
-        columns: ["user_id"];
-        isOneToOne: false;
-        referencedRelation: "users";
-        referencedColumns: ["id"];
-      }
-    ];
   };
 }
