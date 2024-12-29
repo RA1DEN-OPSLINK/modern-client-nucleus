@@ -18,10 +18,10 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      notifications: NotificationTables['notifications']['Row'];
       clients: ClientsTable['Row'];
       profiles: ProfilesTable['Row'];
       calendar_events: CalendarTables['calendar_events']['Row'];
-      notifications: NotificationTables['notifications']['Row'];
       organizations: OrganizationTables['organizations']['Row'];
       projects: ProjectTables['projects']['Row'];
       teams: TeamTables['teams']['Row'];
