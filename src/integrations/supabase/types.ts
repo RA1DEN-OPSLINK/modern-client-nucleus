@@ -397,6 +397,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          display_name: string | null
           first_name: string | null
           id: string
           last_name: string | null
@@ -404,6 +405,7 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           role: string
+          state: string | null
           updated_at: string
         }
         Insert: {
@@ -412,6 +414,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          display_name?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
@@ -419,6 +422,7 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           role?: string
+          state?: string | null
           updated_at?: string
         }
         Update: {
@@ -427,6 +431,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          display_name?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
@@ -434,6 +439,7 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           role?: string
+          state?: string | null
           updated_at?: string
         }
         Relationships: [
