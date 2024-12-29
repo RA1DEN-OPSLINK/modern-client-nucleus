@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { AppRoutes } from "@/routes";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,9 +8,9 @@ import { LoadingSpinner } from "@/components/auth/LoadingSpinner";
 
 const App = () => {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Initialize session on app load
     const initSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -20,12 +20,12 @@ const App = () => {
         }
         if (!session) {
           console.log("No active session found");
+          setIsLoading(false);
           return;
         }
         
         console.log("Session initialized successfully");
         
-        // Verify the user has a profile
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("*")
@@ -61,12 +61,13 @@ const App = () => {
           title: "Authentication Error",
           description: "There was a problem with your session. Please try logging in again.",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     initSession();
 
-    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Auth state changed:", event, session?.user?.id);
@@ -74,8 +75,10 @@ const App = () => {
         if (event === 'SIGNED_OUT') {
           console.log('User signed out, clearing session');
           localStorage.clear();
+          setIsLoading(false);
         } else if (event === 'SIGNED_IN' && session?.user) {
           console.log('User signed in, session established');
+          setIsLoading(true);
           try {
             const { data: profile, error: profileError } = await supabase
               .from("profiles")
@@ -103,6 +106,8 @@ const App = () => {
               title: "Authentication Error",
               description: "There was a problem verifying your profile. Please try logging in again.",
             });
+          } finally {
+            setIsLoading(false);
           }
         }
       }
@@ -112,6 +117,10 @@ const App = () => {
       subscription.unsubscribe();
     };
   }, [toast]);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
