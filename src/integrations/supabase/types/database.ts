@@ -1,10 +1,9 @@
 import type { AuthTables } from './tables/auth';
 import type { CalendarTables } from './tables/calendar';
-import type { ClientTables } from './tables/clients';
-import type { FileTables } from './tables/files';
+import type { ClientsTable } from './tables/clients';
 import type { NotificationTables } from './tables/notifications';
 import type { OrganizationTables } from './tables/organizations';
-import type { ProfileTables } from './tables/profiles';
+import type { ProfilesTable } from './tables/profiles';
 import type { ProjectTables } from './tables/projects';
 import type { TeamTables } from './tables/teams';
 
@@ -18,14 +17,15 @@ export type Json =
 
 export interface Database {
   public: {
-    Tables: ClientTables &
-           CalendarTables &
-           FileTables &
-           NotificationTables &
-           OrganizationTables &
-           ProfileTables &
-           ProjectTables &
-           TeamTables;
+    Tables: {
+      clients: ClientsTable['Row'];
+      profiles: ProfilesTable['Row'];
+      calendar_events: CalendarTables['calendar_events']['Row'];
+      notifications: NotificationTables['notifications']['Row'];
+      organizations: OrganizationTables['organizations']['Row'];
+      projects: ProjectTables['projects']['Row'];
+      teams: TeamTables['teams']['Row'];
+    };
     Views: {
       [_ in never]: never;
     };
@@ -52,19 +52,3 @@ export interface Database {
   };
   auth: AuthTables;
 }
-
-export type Tables<
-  T extends keyof Database['public']['Tables'],
-> = Database['public']['Tables'][T]['Row'];
-
-export type TablesInsert<
-  T extends keyof Database['public']['Tables'],
-> = Database['public']['Tables'][T]['Insert'];
-
-export type TablesUpdate<
-  T extends keyof Database['public']['Tables'],
-> = Database['public']['Tables'][T]['Update'];
-
-export type Enums<
-  T extends keyof Database['public']['Enums'],
-> = Database['public']['Enums'][T];
