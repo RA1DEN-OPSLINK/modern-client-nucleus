@@ -13,14 +13,12 @@ const App = () => {
   }
 
   return (
-    <>
-      <AppProviders>
-        <Suspense fallback={<LoadingSpinner />}>
-          <AppRoutes />
-        </Suspense>
-      </AppProviders>
+    <AppProviders>
+      <Suspense fallback={<LoadingSpinner />}>
+        <AppRoutes />
+      </Suspense>
       <Toaster />
-    </>
+    </AppProviders>
   );
 };
 

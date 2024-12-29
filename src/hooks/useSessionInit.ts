@@ -13,18 +13,23 @@ export const useSessionInit = () => {
         
         if (error) {
           console.error("Error initializing session:", error);
+          toast({
+            variant: "destructive",
+            title: "Session Error",
+            description: "There was a problem loading your session. Please try again.",
+          });
           setIsLoading(false);
           return;
         }
 
         if (!session) {
-          console.log("No active session found");
+          console.log("No active session");
           setIsLoading(false);
           return;
         }
 
         // Only fetch profile if we have a session
-        const { data: profile, error: profileError } = await supabase
+        const { error: profileError } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", session.user.id)
@@ -35,7 +40,7 @@ export const useSessionInit = () => {
           toast({
             variant: "destructive",
             title: "Profile Error",
-            description: "There was a problem loading your profile. Please try again.",
+            description: "There was a problem loading your profile.",
           });
         }
 
@@ -46,8 +51,10 @@ export const useSessionInit = () => {
       }
     };
 
+    // Initialize session
     initSession();
 
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Auth state changed:", event);
@@ -57,7 +64,7 @@ export const useSessionInit = () => {
           return;
         }
 
-        if (event === 'SIGNED_IN' && session?.user) {
+        if (event === 'SIGNED_IN' && session) {
           await initSession();
         }
       }
