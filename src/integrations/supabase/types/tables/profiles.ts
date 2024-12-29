@@ -4,6 +4,7 @@ export interface ProfilesTable {
     organization_id: string | null;
     first_name: string | null;
     last_name: string | null;
+    display_name: string | null;
     avatar_url: string | null;
     created_at: string;
     updated_at: string;
@@ -11,6 +12,7 @@ export interface ProfilesTable {
     postal_code: string | null;
     phone: string | null;
     city: string | null;
+    state: string | null;
     country: string | null;
     address: string | null;
   };
@@ -19,6 +21,7 @@ export interface ProfilesTable {
     organization_id?: string | null;
     first_name?: string | null;
     last_name?: string | null;
+    display_name?: string | null;
     avatar_url?: string | null;
     created_at?: string;
     updated_at?: string;
@@ -26,6 +29,7 @@ export interface ProfilesTable {
     postal_code?: string | null;
     phone?: string | null;
     city?: string | null;
+    state?: string | null;
     country?: string | null;
     address?: string | null;
   };
@@ -34,6 +38,7 @@ export interface ProfilesTable {
     organization_id?: string | null;
     first_name?: string | null;
     last_name?: string | null;
+    display_name?: string | null;
     avatar_url?: string | null;
     created_at?: string;
     updated_at?: string;
@@ -41,6 +46,7 @@ export interface ProfilesTable {
     postal_code?: string | null;
     phone?: string | null;
     city?: string | null;
+    state?: string | null;
     country?: string | null;
     address?: string | null;
   };

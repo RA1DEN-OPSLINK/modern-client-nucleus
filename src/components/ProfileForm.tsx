@@ -14,7 +14,14 @@ import { ProfileFields } from "./profile/ProfileFields";
 const profileSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
+  display_name: z.string().optional(),
   avatar_url: z.string().nullable(),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postal_code: z.string().optional(),
+  country: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -32,7 +39,14 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     defaultValues: {
       first_name: profile.first_name || "",
       last_name: profile.last_name || "",
+      display_name: profile.display_name || "",
       avatar_url: profile.avatar_url || null,
+      phone: profile.phone || "",
+      address: profile.address || "",
+      city: profile.city || "",
+      state: profile.state || "",
+      postal_code: profile.postal_code || "",
+      country: profile.country || "",
     },
   });
 
