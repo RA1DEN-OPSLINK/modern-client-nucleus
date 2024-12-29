@@ -1,27 +1,27 @@
+import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useQuery } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
-import { useSessionContext } from "@supabase/auth-helpers-react";
 
 export function NotificationsMenu() {
   const { session } = useSessionContext();
 
-  const { data: notificationCount = 0 } = useQuery({
-    queryKey: ["notifications", session?.user?.id],
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ["notifications-count"],
     queryFn: async () => {
       if (!session?.user?.id) return 0;
-      
+
       const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', session.user.id)
-        .eq('read', false);
+        .from("notifications")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", session.user.id)
+        .eq("read", false);
 
       if (error) {
         console.error("Error fetching notifications:", error);
-        return 0;
+        throw error;
       }
 
       return count || 0;
@@ -36,12 +36,12 @@ export function NotificationsMenu() {
       className="relative hover:bg-accent"
     >
       <Bell className="h-5 w-5" />
-      {notificationCount > 0 && (
+      {unreadCount > 0 && (
         <Badge 
           variant="secondary" 
-          className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+          className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
         >
-          {notificationCount}
+          {unreadCount}
         </Badge>
       )}
     </Button>

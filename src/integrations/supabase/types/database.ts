@@ -5,7 +5,7 @@ import type { NotificationTables } from './tables/notifications';
 import type { OrganizationTables } from './tables/organizations';
 import type { ProfilesTable } from './tables/profiles';
 import type { ProjectTables } from './tables/projects';
-import type { TeamTables } from './tables/teams';
+import type { TeamTables } from './teams';
 
 export type Json =
   | string

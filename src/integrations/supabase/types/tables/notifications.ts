@@ -27,5 +27,14 @@ export interface NotificationTables {
       created_at?: string;
       updated_at?: string;
     };
+    Relationships: [
+      {
+        foreignKeyName: "notifications_user_id_fkey";
+        columns: ["user_id"];
+        isOneToOne: false;
+        referencedRelation: "users";
+        referencedColumns: ["id"];
+      }
+    ];
   };
 }
