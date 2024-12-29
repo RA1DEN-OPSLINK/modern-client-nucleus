@@ -5,7 +5,8 @@ import type {
   ProfilesTable,
   RolePermissionsTable,
   TeamMembersTable,
-  TeamsTable
+  TeamsTable,
+  NotificationsTable
 } from './tables';
 
 export type Json =
@@ -26,6 +27,7 @@ export interface Database {
       role_permissions: RolePermissionsTable;
       team_members: TeamMembersTable;
       teams: TeamsTable;
+      notifications: NotificationsTable;
     };
     Views: {
       [_ in never]: never;

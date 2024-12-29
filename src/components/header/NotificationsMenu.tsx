@@ -13,12 +13,11 @@ export function NotificationsMenu() {
     queryFn: async () => {
       if (!session?.user?.id) return 0;
       
-      // Example query - adjust based on your notifications table structure
       const { count, error } = await supabase
-        .from("notifications")
-        .select("*", { count: 'exact', head: true })
-        .eq("user_id", session.user.id)
-        .eq("read", false);
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', session.user.id)
+        .eq('read', false);
 
       if (error) {
         console.error("Error fetching notifications:", error);
