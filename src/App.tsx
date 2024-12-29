@@ -4,6 +4,7 @@ import { AppRoutes } from "@/routes";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { LoadingSpinner } from "@/components/auth/LoadingSpinner";
 
 const App = () => {
   const { toast } = useToast();
@@ -72,11 +73,10 @@ const App = () => {
         
         if (event === 'SIGNED_OUT') {
           console.log('User signed out, clearing session');
-          localStorage.clear(); // Clear all local storage data
+          localStorage.clear();
         } else if (event === 'SIGNED_IN' && session?.user) {
           console.log('User signed in, session established');
           try {
-            // Verify the user has a profile
             const { data: profile, error: profileError } = await supabase
               .from("profiles")
               .select("*")
