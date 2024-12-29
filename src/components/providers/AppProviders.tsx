@@ -33,8 +33,6 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
           <ThemeProvider defaultTheme="system" storageKey="app-theme">
             <TooltipProvider>
               {children}
-              <Toaster />
-              <Sonner />
             </TooltipProvider>
           </ThemeProvider>
         </BrowserRouter>

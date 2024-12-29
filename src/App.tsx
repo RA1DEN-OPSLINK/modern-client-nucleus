@@ -3,6 +3,7 @@ import { AppProviders } from "@/components/providers/AppProviders";
 import { AppRoutes } from "@/routes";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 const App = () => {
   const { toast } = useToast();
@@ -113,9 +114,12 @@ const App = () => {
   }, [toast]);
 
   return (
-    <AppProviders>
-      <AppRoutes />
-    </AppProviders>
+    <>
+      <AppProviders>
+        <AppRoutes />
+      </AppProviders>
+      <Toaster />
+    </>
   );
 };
 
