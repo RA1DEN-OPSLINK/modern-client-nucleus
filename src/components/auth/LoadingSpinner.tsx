@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export const LoadingSpinner = ({ className }: { className?: string }) => {
   return (
-    <div className={cn("flex h-screen items-center justify-center bg-background/50", className)}>
+    <div className={cn("flex h-screen items-center justify-center bg-background", className)}>
       <motion.div 
         className="relative"
         initial={{ opacity: 0, scale: 0.5 }}

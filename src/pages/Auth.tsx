@@ -1,33 +1,16 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSessionContext } from "@supabase/auth-helpers-react";
-import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
-import { MoonIcon, SunIcon } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import Particles from "react-tsparticles";
-import { loadSlim } from "tsparticles-slim";
-import type { Engine } from "tsparticles-engine";
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-};
+import { LoadingSpinner } from "@/components/auth/LoadingSpinner";
+import { AuthBackground } from "@/components/auth/AuthBackground";
+import { ThemeToggle } from "@/components/auth/ThemeToggle";
+import { AuthForm } from "@/components/auth/AuthForm";
 
 const Auth = () => {
   const { session, isLoading } = useSessionContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, setTheme } = useTheme();
-
-  const particlesInit = async (engine: Engine) => {
-    await loadSlim(engine);
-  };
 
   useEffect(() => {
     if (!isLoading && session) {
@@ -37,16 +20,7 @@ const Auth = () => {
   }, [session, isLoading, navigate, location]);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="h-32 w-32 animate-spin rounded-full border-b-2 border-primary"
-        />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (session) {
@@ -55,90 +29,14 @@ const Auth = () => {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background/50 p-4">
-      <Particles
-        id="tsparticles"
-        init={particlesInit}
-        options={{
-          background: {
-            color: {
-              value: "transparent",
-            },
-          },
-          fpsLimit: 120,
-          particles: {
-            color: {
-              value: theme === "dark" ? "#ffffff" : "#000000",
-            },
-            links: {
-              color: theme === "dark" ? "#ffffff" : "#000000",
-              distance: 150,
-              enable: true,
-              opacity: 0.2,
-              width: 1,
-            },
-            move: {
-              enable: true,
-              outModes: {
-                default: "bounce",
-              },
-              random: true,
-              speed: 1,
-              straight: false,
-            },
-            number: {
-              density: {
-                enable: true,
-                area: 800,
-              },
-              value: 80,
-            },
-            opacity: {
-              value: 0.3,
-            },
-            shape: {
-              type: "circle",
-            },
-            size: {
-              value: { min: 1, max: 3 },
-            },
-          },
-          detectRetina: true,
-        }}
-        className="absolute inset-0 -z-10"
-      />
-
+      <AuthBackground />
+      <ThemeToggle />
+      
       <motion.div
-        initial="hidden"
-        animate="visible"
         variants={{
           hidden: { opacity: 0 },
           visible: { opacity: 1 }
         }}
-        className="absolute right-4 top-4 flex items-center gap-4"
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          className="rounded-full"
-        >
-          <motion.div
-            initial={false}
-            animate={{ rotate: theme === "dark" ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {theme === "light" ? (
-              <MoonIcon className="h-5 w-5" />
-            ) : (
-              <SunIcon className="h-5 w-5" />
-            )}
-          </motion.div>
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </motion.div>
-
-      <motion.div
-        variants={fadeIn}
         initial="hidden"
         animate="visible"
         className="w-full max-w-md space-y-8"
@@ -156,54 +54,7 @@ const Auth = () => {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card className="backdrop-blur-sm bg-background/80 border-none shadow-lg">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl">Sign in</CardTitle>
-              <CardDescription>
-                Choose your preferred sign in method
-              </CardDescription>
-            </CardHeader>
-            <Separator className="mb-4" />
-            <CardContent>
-              <SupabaseAuth
-                supabaseClient={supabase}
-                appearance={{
-                  theme: ThemeSupa,
-                  variables: {
-                    default: {
-                      colors: {
-                        brand: 'hsl(var(--primary))',
-                        brandAccent: 'hsl(var(--primary))',
-                        brandButtonText: 'hsl(var(--primary-foreground))',
-                        defaultButtonBackground: 'hsl(var(--secondary))',
-                        defaultButtonBackgroundHover: 'hsl(var(--secondary))',
-                        inputBackground: 'hsl(var(--background))',
-                        inputBorder: 'hsl(var(--border))',
-                        inputBorderHover: 'hsl(var(--border))',
-                        inputBorderFocus: 'hsl(var(--ring))',
-                        inputText: 'hsl(var(--foreground))',
-                        messageText: 'hsl(var(--muted-foreground))',
-                      },
-                    },
-                  },
-                  className: {
-                    container: 'space-y-4',
-                    button: 'rounded-md px-4 py-2 w-full font-medium shadow-sm transition-colors',
-                    label: 'text-sm font-medium text-foreground',
-                    input: 'mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                    message: 'text-sm text-muted-foreground mt-2',
-                  },
-                }}
-                providers={[]}
-              />
-            </CardContent>
-          </Card>
-        </motion.div>
+        <AuthForm />
       </motion.div>
     </div>
   );
