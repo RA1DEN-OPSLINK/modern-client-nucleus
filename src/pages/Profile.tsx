@@ -42,7 +42,9 @@ const Profile = () => {
       return data as ProfilesTable["Row"];
     },
     enabled: !!session?.user?.id,
-    retry: 1
+    retry: 1,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    gcTime: 1000 * 60 * 10, // Keep unused data for 10 minutes
   });
 
   // Handle session loading state
