@@ -6,11 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProfilesTable } from "@/integrations/supabase/types/tables";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, RefreshCcw } from "lucide-react";
+import { AlertCircle, RefreshCcw, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const { session } = useSessionContext();
+  const { session, isLoading: isSessionLoading } = useSessionContext();
+  const navigate = useNavigate();
   
   const { data: profile, isLoading, error, refetch } = useQuery({
     queryKey: ["profile"],
@@ -42,6 +44,44 @@ const Profile = () => {
     enabled: !!session?.user?.id,
     retry: 1
   });
+
+  // Handle session loading state
+  if (isSessionLoading) {
+    return (
+      <div className="container max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle>Loading...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-48 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Handle no session
+  if (!session) {
+    return (
+      <div className="container max-w-2xl">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            <span>Please sign in to view your profile.</span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate("/auth")}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign In
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   if (error) {
     return (
