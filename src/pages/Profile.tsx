@@ -15,7 +15,7 @@ const Profile = () => {
   const navigate = useNavigate();
   
   const { data: profile, isLoading, error, refetch } = useQuery({
-    queryKey: ["profile"],
+    queryKey: ["profile", session?.user?.id],
     queryFn: async () => {
       if (!session?.user?.id) {
         throw new Error("No user session found");
