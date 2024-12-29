@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { MoonIcon, SunIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import Particles from "react-tsparticles";
+import { loadSlim } from "tsparticles-slim";
+import type { Engine } from "tsparticles-engine";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -22,15 +25,17 @@ const Auth = () => {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
 
+  const particlesInit = async (engine: Engine) => {
+    await loadSlim(engine);
+  };
+
   useEffect(() => {
     if (!isLoading && session) {
-      // Get the redirect path from location state or default to '/'
       const from = location.state?.from || '/';
       navigate(from, { replace: true });
     }
   }, [session, isLoading, navigate, location]);
 
-  // Show loading spinner while checking session
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -44,13 +49,64 @@ const Auth = () => {
     );
   }
 
-  // If we have a session, don't render the auth page
   if (session) {
     return null;
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background/50 p-4">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background/50 p-4">
+      <Particles
+        id="tsparticles"
+        init={particlesInit}
+        options={{
+          background: {
+            color: {
+              value: "transparent",
+            },
+          },
+          fpsLimit: 120,
+          particles: {
+            color: {
+              value: theme === "dark" ? "#ffffff" : "#000000",
+            },
+            links: {
+              color: theme === "dark" ? "#ffffff" : "#000000",
+              distance: 150,
+              enable: true,
+              opacity: 0.2,
+              width: 1,
+            },
+            move: {
+              enable: true,
+              outModes: {
+                default: "bounce",
+              },
+              random: true,
+              speed: 1,
+              straight: false,
+            },
+            number: {
+              density: {
+                enable: true,
+                area: 800,
+              },
+              value: 80,
+            },
+            opacity: {
+              value: 0.3,
+            },
+            shape: {
+              type: "circle",
+            },
+            size: {
+              value: { min: 1, max: 3 },
+            },
+          },
+          detectRetina: true,
+        }}
+        className="absolute inset-0 -z-10"
+      />
+
       <motion.div
         initial="hidden"
         animate="visible"
@@ -105,7 +161,7 @@ const Auth = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="border-none shadow-lg">
+          <Card className="backdrop-blur-sm bg-background/80 border-none shadow-lg">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl">Sign in</CardTitle>
               <CardDescription>
