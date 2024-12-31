@@ -37,40 +37,43 @@ export function AvatarUpload({
     try {
       setIsUploading(true);
       
-      const { error: bucketError } = await supabase
-        .storage
-        .createBucket('avatars', { public: true });
-      
-      if (bucketError && bucketError.message !== 'Bucket already exists') {
-        throw bucketError;
-      }
-
+      // Generate a unique file name using the profile ID and file extension
       const fileExt = file.name.split('.').pop();
       const fileName = `${profileId}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
+
+      // Upload the file to the avatars bucket
+      const { error: uploadError, data } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, { upsert: true });
+        .upload(fileName, file, { 
+          upsert: true,
+          cacheControl: '3600'
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("Error uploading avatar:", uploadError);
+        throw uploadError;
+      }
 
-      const { data: publicUrl } = supabase.storage
+      // Get the public URL for the uploaded file
+      const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      setValue('avatar_url', publicUrl.publicUrl);
-      onUploadComplete(publicUrl.publicUrl);
+      // Update the form with the new avatar URL
+      setValue('avatar_url', publicUrl);
+      onUploadComplete(publicUrl);
 
       toast({
         title: "Avatar updated",
         description: "Your avatar has been updated successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error uploading avatar:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to upload avatar. Please try again.",
       });
-      console.error("Error uploading avatar:", error);
     } finally {
       setIsUploading(false);
     }
