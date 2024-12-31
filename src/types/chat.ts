@@ -15,7 +15,7 @@ export interface ChatMessage {
 }
 
 export interface UserStatus {
-  status: string;
+  status: string | null;
   last_active: string;
 }
 
@@ -24,5 +24,5 @@ export interface ChatUser {
   first_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
-  user_status?: UserStatus[];
+  user_status: UserStatus[];
 }

@@ -24,22 +24,24 @@ export function ChatSidebar({
 
       const { data, error } = await supabase
         .from("profiles")
-        .select(
-          `
+        .select(`
           id,
           first_name,
           last_name,
           avatar_url,
-          user_status!profiles_id_fkey(
+          user_status (
             status,
             last_active
           )
-        `
-        )
+        `)
         .eq("organization_id", organizationId)
         .neq("id", currentUserId);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching users:", error);
+        throw error;
+      }
+      
       return (data || []) as unknown as ChatUser[];
     },
     enabled: !!organizationId,
