@@ -42,7 +42,7 @@ export function ChatMessages({
         .range(startRange, endRange);
 
       if (error) throw error;
-      return messages as ChatMessage[];
+      return messages as unknown as ChatMessage[];
     },
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === 50 ? allPages.length : undefined;

@@ -38,7 +38,7 @@ export function ChatSidebar({
         .neq("id", currentUserId);
 
       if (error) throw error;
-      return (data || []) as ChatUser[];
+      return (data || []) as unknown as ChatUser[];
     },
     enabled: !!organizationId,
   });
