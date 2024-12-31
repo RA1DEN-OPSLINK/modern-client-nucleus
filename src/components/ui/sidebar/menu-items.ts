@@ -74,6 +74,12 @@ export const menuSections: MenuSection[] = [
         roles: ['tenant', 'manager', 'team']
       },
       {
+        title: "Chat",
+        path: "/chat",
+        icon: MessageSquare,
+        roles: ['tenant', 'manager', 'team']
+      },
+      {
         title: "My Profile",
         path: "/profile",
         icon: User,
