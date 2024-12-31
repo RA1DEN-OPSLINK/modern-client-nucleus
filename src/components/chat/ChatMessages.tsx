@@ -19,17 +19,18 @@ export function ChatMessages({
 }: ChatMessagesProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery<ChatMessage[]>({
+  const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
     queryKey: ["chat-messages", selectedUserId],
+    initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
-      const startRange = Number(pageParam) * 50;
+      const startRange = pageParam * 50;
       const endRange = startRange + 49;
 
       const { data, error } = await supabase
         .from("messages")
         .select(`
           *,
-          sender:profiles!inner(
+          sender:profiles(
             first_name,
             last_name,
             avatar_url

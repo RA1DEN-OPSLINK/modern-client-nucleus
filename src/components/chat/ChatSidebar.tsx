@@ -17,7 +17,7 @@ export function ChatSidebar({
   onSelectUser,
   selectedUserId,
 }: ChatSidebarProps) {
-  const { data: users, isLoading } = useQuery<ChatUser[]>({
+  const { data: users, isLoading } = useQuery({
     queryKey: ["chat-users", organizationId],
     queryFn: async () => {
       if (!organizationId) return [];
@@ -29,7 +29,10 @@ export function ChatSidebar({
           first_name,
           last_name,
           avatar_url,
-          user_status:user_status!left(*)
+          user_status(
+            status,
+            last_active
+          )
         `)
         .eq("organization_id", organizationId)
         .neq("id", currentUserId);
