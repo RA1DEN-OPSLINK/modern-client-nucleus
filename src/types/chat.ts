@@ -1,19 +1,22 @@
 export interface ChatMessage {
   id: string;
   sender_id: string;
+  organization_id: string;
   content: string;
+  attachment_path: string | null;
+  attachment_type: string | null;
   created_at: string;
-  attachment_path?: string;
-  attachment_type?: string;
+  updated_at: string;
   sender?: {
-    first_name?: string | null;
-    last_name?: string | null;
-    avatar_url?: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
   };
 }
 
 export interface UserStatus {
-  status: 'online' | 'offline' | 'away' | 'do_not_disturb';
+  user_id: string;
+  status: string;
   last_active: string;
 }
 

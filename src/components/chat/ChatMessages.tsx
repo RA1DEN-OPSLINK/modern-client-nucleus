@@ -22,14 +22,14 @@ export function ChatMessages({
   const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery<ChatMessage[]>({
     queryKey: ["chat-messages", selectedUserId],
     queryFn: async ({ pageParam = 0 }) => {
-      const startRange = pageParam * 50;
+      const startRange = Number(pageParam) * 50;
       const endRange = startRange + 49;
 
       const { data, error } = await supabase
         .from("messages")
         .select(`
           *,
-          sender:profiles!messages_sender_id_fkey (
+          sender:profiles!inner(
             first_name,
             last_name,
             avatar_url
@@ -41,7 +41,7 @@ export function ChatMessages({
         .range(startRange, endRange);
 
       if (error) throw error;
-      return data;
+      return data as ChatMessage[];
     },
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === 50 ? allPages.length : undefined;

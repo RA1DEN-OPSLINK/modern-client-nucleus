@@ -1,70 +1,43 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatUser } from "@/types/chat";
 
 interface ChatSidebarProps {
   currentUserId: string;
-  organizationId: string;
-  selectedUserId: string | null;
+  organizationId: string | null;
   onSelectUser: (userId: string) => void;
+  selectedUserId: string | null;
 }
 
 export function ChatSidebar({
   currentUserId,
   organizationId,
-  selectedUserId,
   onSelectUser,
+  selectedUserId,
 }: ChatSidebarProps) {
   const { data: users, isLoading } = useQuery<ChatUser[]>({
     queryKey: ["chat-users", organizationId],
     queryFn: async () => {
-      const { data: profiles, error } = await supabase
+      if (!organizationId) return [];
+
+      const { data, error } = await supabase
         .from("profiles")
         .select(`
           id,
           first_name,
           last_name,
           avatar_url,
-          user_status (
-            status,
-            last_active
-          )
+          user_status:user_status!left(*)
         `)
         .eq("organization_id", organizationId)
         .neq("id", currentUserId);
 
       if (error) throw error;
-      return profiles;
+      return (data || []) as ChatUser[];
     },
-  });
-
-  // Subscribe to status changes
-  useQuery({
-    queryKey: ["user-status-subscription"],
-    queryFn: async () => {
-      const channel = supabase
-        .channel("user-status-changes")
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "user_status",
-          },
-          (payload) => {
-            console.log("Status changed:", payload);
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    },
+    enabled: !!organizationId,
   });
 
   const getInitials = (firstName?: string | null, lastName?: string | null) => {
@@ -74,65 +47,65 @@ export function ChatSidebar({
     ).toUpperCase()}`;
   };
 
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case "online":
-        return "bg-green-500";
-      case "away":
-        return "bg-yellow-500";
-      case "do_not_disturb":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
-    }
+  const getUserStatus = (user: ChatUser) => {
+    const status = user.user_status?.[0]?.status || "offline";
+    return status;
   };
 
   if (isLoading) {
     return <div className="p-4">Loading users...</div>;
   }
 
+  if (!users?.length) {
+    return <div className="p-4">No users found</div>;
+  }
+
   return (
-    <ScrollArea className="h-[calc(100vh-6rem)]">
-      <div className="p-4 space-y-4">
-        <h2 className="font-semibold">Team Members</h2>
-        <div className="space-y-2">
-          {users?.map((user) => (
-            <Button
+    <ScrollArea className="h-[calc(100vh-4rem)]">
+      <div className="space-y-2 p-2">
+        {users.map((user) => {
+          const status = getUserStatus(user);
+          return (
+            <button
               key={user.id}
-              variant="ghost"
-              className={`w-full justify-start ${
-                selectedUserId === user.id ? "bg-accent" : ""
-              }`}
               onClick={() => onSelectUser(user.id)}
+              className={`w-full flex items-center space-x-3 p-2 rounded-lg transition-colors ${
+                selectedUserId === user.id
+                  ? "bg-primary/10"
+                  : "hover:bg-muted"
+              }`}
             >
-              <div className="flex items-center space-x-2">
-                <div className="relative">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar_url || undefined} />
-                    <AvatarFallback>
-                      {getInitials(user.first_name, user.last_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div
-                    className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ring-2 ring-white ${getStatusColor(
-                      user.user_status?.[0]?.status
-                    )}`}
+              <div className="relative">
+                <Avatar>
+                  <AvatarImage
+                    src={user.avatar_url || undefined}
+                    alt={`${user.first_name} ${user.last_name}`}
                   />
+                  <AvatarFallback>
+                    {getInitials(user.first_name, user.last_name)}
+                  </AvatarFallback>
+                </Avatar>
+                <span
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-background ${
+                    status === "online"
+                      ? "bg-green-500"
+                      : status === "away"
+                      ? "bg-yellow-500"
+                      : "bg-gray-500"
+                  }`}
+                />
+              </div>
+              <div className="flex-1 text-left">
+                <div className="font-medium">
+                  {user.first_name} {user.last_name}
                 </div>
-                <div className="flex flex-col items-start">
-                  <span className="text-sm">
-                    {user.first_name} {user.last_name}
-                  </span>
-                  {user.user_status?.[0]?.status && (
-                    <Badge variant="secondary" className="text-xs">
-                      {user.user_status[0].status}
-                    </Badge>
-                  )}
+                <div className="text-xs text-muted-foreground capitalize">
+                  {status}
                 </div>
               </div>
-            </Button>
-          ))}
-        </div>
+            </button>
+          );
+        })}
       </div>
     </ScrollArea>
   );
