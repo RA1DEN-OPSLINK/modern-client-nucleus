@@ -29,7 +29,7 @@ export function ChatSidebar({
           first_name,
           last_name,
           avatar_url,
-          user_status!profiles_id_fkey(
+          user_status(
             status,
             last_active
           )
@@ -38,7 +38,7 @@ export function ChatSidebar({
         .neq("id", currentUserId);
 
       if (error) throw error;
-      return data as ChatUser[];
+      return (data || []) as ChatUser[];
     },
     enabled: !!organizationId,
   });

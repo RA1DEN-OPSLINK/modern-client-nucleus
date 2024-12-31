@@ -30,7 +30,7 @@ export function ChatMessages({
         .from("messages")
         .select(`
           *,
-          sender:profiles!messages_sender_id_fkey(
+          sender:profiles(
             first_name,
             last_name,
             avatar_url
