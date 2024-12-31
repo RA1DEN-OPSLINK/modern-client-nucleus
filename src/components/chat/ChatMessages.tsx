@@ -26,11 +26,11 @@ export function ChatMessages({
       const startRange = pageParam * 50;
       const endRange = startRange + 49;
 
-      const { data, error } = await supabase
+      const { data: messages, error } = await supabase
         .from("messages")
         .select(`
           *,
-          sender:profiles(
+          sender:profiles!messages_sender_id_fkey(
             first_name,
             last_name,
             avatar_url
@@ -42,7 +42,7 @@ export function ChatMessages({
         .range(startRange, endRange);
 
       if (error) throw error;
-      return data as ChatMessage[];
+      return messages as ChatMessage[];
     },
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === 50 ? allPages.length : undefined;
