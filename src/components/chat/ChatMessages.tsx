@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
+import { ChatMessage } from "@/types/chat";
 
 interface ChatMessagesProps {
   currentUserId: string;
@@ -18,9 +19,12 @@ export function ChatMessages({
 }: ChatMessagesProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
+  const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery<ChatMessage[]>({
     queryKey: ["chat-messages", selectedUserId],
     queryFn: async ({ pageParam = 0 }) => {
+      const startRange = pageParam * 50;
+      const endRange = startRange + 49;
+
       const { data, error } = await supabase
         .from("messages")
         .select(`
@@ -34,7 +38,7 @@ export function ChatMessages({
         .eq("organization_id", organizationId)
         .or(`sender_id.eq.${currentUserId},sender_id.eq.${selectedUserId}`)
         .order("created_at", { ascending: false })
-        .range(pageParam * 50, (pageParam + 1) * 50 - 1);
+        .range(startRange, endRange);
 
       if (error) throw error;
       return data;
@@ -42,7 +46,6 @@ export function ChatMessages({
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === 50 ? allPages.length : undefined;
     },
-    initialPageSize: 50,
   });
 
   // Subscribe to new messages

@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ChatUser } from "@/types/chat";
 
 interface ChatSidebarProps {
   currentUserId: string;
@@ -18,7 +19,7 @@ export function ChatSidebar({
   selectedUserId,
   onSelectUser,
 }: ChatSidebarProps) {
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading } = useQuery<ChatUser[]>({
     queryKey: ["chat-users", organizationId],
     queryFn: async () => {
       const { data: profiles, error } = await supabase
@@ -73,7 +74,7 @@ export function ChatSidebar({
     ).toUpperCase()}`;
   };
 
-  const getStatusColor = (status?: string | null) => {
+  const getStatusColor = (status?: string) => {
     switch (status) {
       case "online":
         return "bg-green-500";
