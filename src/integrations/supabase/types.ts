@@ -318,6 +318,47 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          attachment_path: string | null
+          attachment_type: string | null
+          content: string
+          created_at: string
+          id: string
+          organization_id: string
+          sender_id: string
+          updated_at: string
+        }
+        Insert: {
+          attachment_path?: string | null
+          attachment_type?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          sender_id: string
+          updated_at?: string
+        }
+        Update: {
+          attachment_path?: string | null
+          attachment_type?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          sender_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -655,6 +696,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_status: {
+        Row: {
+          last_active: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          last_active?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          last_active?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

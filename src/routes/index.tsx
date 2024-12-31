@@ -15,6 +15,7 @@ import Files from "@/pages/Files";
 import Map from "@/pages/Map";
 import Settings from "@/pages/Settings";
 import Calendar from "@/pages/Calendar";
+import Chat from "@/pages/Chat";
 
 export const AppRoutes = () => (
   <Routes>
@@ -105,6 +106,16 @@ export const AppRoutes = () => (
         <ProtectedRoute>
           <AppLayout>
             <Calendar />
+          </AppLayout>
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/chat"
+      element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Chat />
           </AppLayout>
         </ProtectedRoute>
       }
